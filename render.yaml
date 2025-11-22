@@ -1,0 +1,20 @@
+services:
+  # Frontend (React + Vite)
+  - type: web
+    name: commercial-crm-frontend
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+  # Backend (PocketBase) - Opsiyonel, eğer Render'da çalıştırmak isterseniz
+  # - type: web
+  #   name: commercial-crm-pocketbase
+  #   runtime: docker
+  #   dockerfilePath: ./Dockerfile.pocketbase
+  #   plan: free
+  #   envVars:
+  #     - key: PORT
+  #       value: 8090

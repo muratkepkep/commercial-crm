@@ -1,0 +1,38 @@
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
+import { BottomNav } from "@/components/common/BottomNav"
+import ClientsPage from "@/pages/ClientsPage"
+import PropertiesPage from "@/pages/PropertiesPage"
+import AddPage from "@/pages/AddPage"
+import TodosPage from "@/pages/TodosPage"
+import ProfilePage from "@/pages/ProfilePage"
+import LoginPage from "@/pages/LoginPage"
+import { AuthProvider } from "@/contexts/AuthContext"
+import ProtectedRoute from "@/components/auth/ProtectedRoute"
+
+function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <div className="min-h-screen bg-background font-sans antialiased">
+          <div className="container mx-auto max-w-md p-4">
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
+
+              <Route path="/" element={<ProtectedRoute><ClientsPage /></ProtectedRoute>} />
+              <Route path="/properties" element={<ProtectedRoute><PropertiesPage /></ProtectedRoute>} />
+              <Route path="/add" element={<ProtectedRoute><AddPage /></ProtectedRoute>} />
+              <Route path="/todos" element={<ProtectedRoute><TodosPage /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+
+              {/* Redirect unknown routes to properties if logged in, or login if not */}
+              <Route path="*" element={<Navigate to="/properties" replace />} />
+            </Routes>
+          </div>
+          <BottomNav />
+        </div>
+      </BrowserRouter>
+    </AuthProvider>
+  )
+}
+
+export default App
