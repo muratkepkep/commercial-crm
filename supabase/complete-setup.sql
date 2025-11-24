@@ -77,7 +77,10 @@ CREATE TABLE properties (
   image_urls TEXT[],
   
   -- Durum
-  status TEXT DEFAULT 'active'
+  status TEXT DEFAULT 'active',
+  
+  -- Kullanıcı İlişkisi
+  user_id UUID REFERENCES auth.users(id)
 );
 
 -- ADIM 5: CLIENTS Tablosu
@@ -106,7 +109,10 @@ CREATE TABLE clients (
   min_area_m2 NUMERIC,
   min_power_kw NUMERIC,
   
-  notes TEXT
+  notes TEXT,
+  
+  -- Kullanıcı İlişkisi
+  user_id UUID REFERENCES auth.users(id)
 );
 
 -- ADIM 6: TODOS Tablosu
@@ -120,11 +126,28 @@ CREATE TABLE todos (
   due_date TIMESTAMP WITH TIME ZONE
 );
 
+-- ADIM 6.5: PROPERTY_IMAGES Tablosu
+-- ===================================
+CREATE TABLE property_images (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+  
+  property_id UUID NOT NULL REFERENCES properties(id) ON DELETE CASCADE,
+  storage_path TEXT NOT NULL,
+  file_name TEXT NOT NULL,
+  display_order INTEGER DEFAULT 0,
+  
+  CONSTRAINT unique_property_image UNIQUE(property_id, storage_path)
+);
+
+CREATE INDEX idx_property_images_property_id ON property_images(property_id);
+
 -- ADIM 7: RLS Aktif Et
 -- ===================================
 ALTER TABLE properties ENABLE ROW LEVEL SECURITY;
 ALTER TABLE clients ENABLE ROW LEVEL SECURITY;
 ALTER TABLE todos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE property_images ENABLE ROW LEVEL SECURITY;
 
 -- ADIM 8: HERKESE AÇIK POLICY'LER
 -- ===================================
@@ -166,6 +189,19 @@ CREATE POLICY "Allow public update access" ON todos
   FOR UPDATE USING (true);
 
 CREATE POLICY "Allow public delete access" ON todos
+  FOR DELETE USING (true);
+
+-- Property Images - Herkese Açık
+CREATE POLICY "Allow public read access" ON property_images
+  FOR SELECT USING (true);
+
+CREATE POLICY "Allow public insert access" ON property_images
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Allow public update access" ON property_images
+  FOR UPDATE USING (true);
+
+CREATE POLICY "Allow public delete access" ON property_images
   FOR DELETE USING (true);
 
 -- ADIM 9: STORAGE BUCKET (Görseller)

@@ -223,22 +223,39 @@ export const getClient = async (id: string): Promise<{ data: Client | null; erro
 
 export const createClient = async (clientData: Partial<Client>): Promise<{ data: Client | null; error: any }> => {
     try {
+        console.log('🔵 createClient: Starting with data:', clientData)
+
         const { data: { user } } = await supabase.auth.getUser()
-        if (!user) return { data: null, error: 'Not authenticated' }
+        console.log('🔵 createClient: Auth user:', user ? `${user.id} (${user.email})` : 'NULL')
+
+        if (!user) {
+            console.error('🔴 createClient: Not authenticated!')
+            return { data: null, error: 'Not authenticated' }
+        }
+
+        const dataToInsert = {
+            ...clientData,
+            user_id: user.id
+        }
+        console.log('🔵 createClient: Data to insert:', dataToInsert)
 
         const { data, error } = await supabase
             .from('clients')
-            .insert({
-                ...clientData,
-                user_id: user.id
-            })
+            .insert(dataToInsert)
             .select()
             .single()
 
-        if (error) throw error
+        console.log('🔵 createClient: Supabase response - data:', data, 'error:', error)
+
+        if (error) {
+            console.error('🔴 createClient: Supabase error:', error)
+            throw error
+        }
+
+        console.log('✅ createClient: Success!')
         return { data: data as Client, error: null }
     } catch (error) {
-        console.error('Create client error:', error)
+        console.error('🔴 createClient: Exception:', error)
         return { data: null, error }
     }
 }

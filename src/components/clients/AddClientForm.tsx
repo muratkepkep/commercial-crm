@@ -18,8 +18,21 @@ export function AddClientForm({ onSubmit, onCancel }: AddClientFormProps) {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         const formData = new FormData(e.target as HTMLFormElement)
-        const data = Object.fromEntries(formData)
-        onSubmit({ ...data, role, search_type: searchType })
+        const rawData = Object.fromEntries(formData)
+
+        // Sayısal alanları temizle (boş string "" yerine null gönderilmeli)
+        const cleanData: any = { ...rawData, role, search_type: searchType }
+
+        const numericFields = ['budget_min', 'budget_max']
+        numericFields.forEach(field => {
+            if (cleanData[field] === "") {
+                cleanData[field] = null
+            } else if (cleanData[field]) {
+                cleanData[field] = parseFloat(cleanData[field])
+            }
+        })
+
+        onSubmit(cleanData)
     }
 
     return (

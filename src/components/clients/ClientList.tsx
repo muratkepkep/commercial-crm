@@ -34,14 +34,25 @@ export function ClientList() {
     const filteredClients = React.useMemo(() => filter === "all" ? clients : clients.filter(c => c.role === filter), [clients, filter])
 
     const handleAddClient = async (data: any) => {
+        console.log('🔵 handleAddClient called with data:', data)
         try {
-            await createClient(data)
+            console.log('🔵 Calling createClient...')
+            const result = await createClient(data)
+            console.log('🔵 createClient result:', result)
+
+            if (result.error) {
+                console.error('🔴 createClient returned error:', result.error)
+                alert(`❌ Hata: ${result.error.message || JSON.stringify(result.error)}`)
+                return
+            }
+
+            console.log('🔵 Client created successfully, reloading list...')
             await loadClients()
             setIsAddOpen(false)
             alert("✅ Müşteri eklendi!")
         } catch (error: any) {
-            console.error('Error adding client:', error)
-            alert(`❌ Hata: ${error.message}`)
+            console.error('🔴 Exception in handleAddClient:', error)
+            alert(`❌ Hata: ${error.message || 'Beklenmeyen hata'}`)
         }
     }
 

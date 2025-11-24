@@ -54,6 +54,7 @@ create table properties (
   
   -- Metadata
   status text default 'active', -- 'active', 'sold', 'rented'
+  user_id uuid references auth.users(id),
   owner_id uuid references profiles(id)
 );
 
@@ -83,8 +84,24 @@ create table clients (
   
   notes text,
   
+  user_id uuid references auth.users(id),
   assigned_to uuid references profiles(id)
 );
+
+-- 3.5 PROPERTY IMAGES (for Supabase Storage)
+create table property_images (
+  id uuid default uuid_generate_v4() primary key,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  
+  property_id uuid not null references properties(id) on delete cascade,
+  storage_path text not null,
+  file_name text not null,
+  display_order integer default 0,
+  
+  constraint unique_property_image unique(property_id, storage_path)
+);
+
+create index idx_property_images_property_id on property_images(property_id);
 
 -- 4. TODOS
 create table todos (
@@ -95,7 +112,7 @@ create table todos (
   is_completed boolean default false,
   due_date timestamp with time zone,
   
-  user_id uuid references profiles(id)
+  user_id uuid references auth.users(id)
 );
 
 -- Set up Row Level Security (RLS)
@@ -104,6 +121,7 @@ alter table profiles enable row level security;
 alter table properties enable row level security;
 alter table clients enable row level security;
 alter table todos enable row level security;
+alter table property_images enable row level security;
 
 -- Policy: Allow authenticated users to read all
 create policy "Allow authenticated read access" on profiles for select to authenticated using (true);
