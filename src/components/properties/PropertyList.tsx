@@ -244,8 +244,28 @@ Detaylar için arayınız.
                     {editingProperty && (
                         <PropertyForm
                             initialData={editingProperty}
-                            onSubmit={async () => {
-                                setEditingProperty(null)
+                            onSubmit={async (updatedData) => {
+                                try {
+                                    console.log('🔵 Updating property:', editingProperty.id, updatedData)
+                                    const { updateProperty } = await import('@/lib/db')
+                                    const { error } = await updateProperty(editingProperty.id, updatedData)
+
+                                    if (error) {
+                                        console.error('🔴 Update error:', error)
+                                        alert(`❌ Güncelleme hatası: ${error.message || JSON.stringify(error)}`)
+                                        return
+                                    }
+
+                                    console.log('✅ Property updated successfully')
+                                    alert('✅ Mülk güncellendi!')
+                                    setEditingProperty(null)
+
+                                    // Listeyi yenile
+                                    window.location.reload()
+                                } catch (error: any) {
+                                    console.error('🔴 Exception updating property:', error)
+                                    alert(`❌ Hata: ${error.message || 'Beklenmeyen hata'}`)
+                                }
                             }}
                         />
                     )}
