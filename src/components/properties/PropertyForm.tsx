@@ -106,9 +106,13 @@ export function PropertyForm({ initialData, onSubmit, isLoading }: PropertyFormP
                 power_kw: power ? parseFloat(power) : undefined,
                 ada: ada || undefined,
                 parsel: parsel || undefined,
-                // Images will be uploaded separately by parent component
-                _imageFiles: selectedFiles.length > 0 ? selectedFiles : undefined,
             }
+
+            // Attach image files (handled by parent component)
+            if (selectedFiles.length > 0) {
+                (propertyData as any)._imageFiles = selectedFiles
+            }
+
 
             await onSubmit(propertyData)
 

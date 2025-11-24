@@ -54,6 +54,7 @@ export interface Todo {
     task: string;
     is_completed: boolean;
     due_date?: string;
+    weekday?: number;
 }
 
 export type UserRole = 'admin' | 'editor' | 'viewer';

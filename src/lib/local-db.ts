@@ -208,7 +208,7 @@ class LocalStorageDB {
                 full_name: 'Yönetici',
                 role: 'admin'
             })
-        } else if (adminUser.password_hash.startsWith('$2a$')) {
+        } else if (adminUser.password_hash?.startsWith('$2a$')) {
             console.log('Updating outdated admin hash...')
             await this.updateUser(adminUser.id, {
                 password_hash: fixedHash

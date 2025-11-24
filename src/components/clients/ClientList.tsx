@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { AddClientForm } from "./AddClientForm"
-import { getClients, createClient, deleteClient } from "@/lib/db"
+import { getClients, createClient } from "@/lib/db"
 
 export function ClientList() {
     const [clients, setClients] = React.useState<Client[]>([])

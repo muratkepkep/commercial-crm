@@ -17,8 +17,8 @@ export default function AddPage() {
         setIsSaving(true)
         try {
             // Extract image files
-            const imageFiles = propertyData._imageFiles as File[] | undefined
-            delete propertyData._imageFiles // Remove from property data
+            const imageFiles = (propertyData as any)._imageFiles as File[] | undefined
+            delete (propertyData as any)._imageFiles // Remove from property data
 
             const dataWithLocation = location
                 ? { ...propertyData, lat: location.lat, lng: location.lng }
