@@ -1,19 +1,8 @@
-import bcrypt from 'bcryptjs'
+// import bcrypt from 'bcryptjs'
 import type { UserRole } from '@/types'
 
-/**
- * Hash a password using bcrypt
- */
-export const hashPassword = async (password: string): Promise<string> => {
-    return await bcrypt.hash(password, 10)
-}
+// Legacy auth functions removed - using Supabase Auth now
 
-/**
- * Verify a password against a hash
- */
-export const verifyPassword = async (password: string, hash: string): Promise<boolean> => {
-    return await bcrypt.compare(password, hash)
-}
 
 /**
  * Check if user can edit properties/clients

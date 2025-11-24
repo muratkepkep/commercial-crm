@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
-import { localDB } from '@/lib/local-db'
-import { hashPassword, verifyPassword } from '@/lib/auth'
+import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -15,13 +14,19 @@ export function PasswordChangeForm() {
     const [confirmPassword, setConfirmPassword] = useState('')
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
+    const [loading, setLoading] = useState(false)
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setError('')
         setSuccess('')
+        setLoading(true)
 
-        if (!user) return
+        if (!user || !user.email) {
+            setError('Kullanıcı bilgisi bulunamadı')
+            setLoading(false)
+            return
+        }
 
         try {
             if (newPassword !== confirmPassword) {
@@ -32,15 +37,22 @@ export function PasswordChangeForm() {
                 throw new Error('Yeni şifre en az 6 karakter olmalıdır')
             }
 
-            // Verify current password
-            const isValid = await verifyPassword(currentPassword, user.password_hash)
-            if (!isValid) {
+            // 1. Mevcut şifreyi doğrula (Re-authentication)
+            const { error: signInError } = await supabase.auth.signInWithPassword({
+                email: user.email,
+                password: currentPassword
+            })
+
+            if (signInError) {
                 throw new Error('Mevcut şifre hatalı')
             }
 
-            // Update password
-            const newHash = await hashPassword(newPassword)
-            await localDB.updateUser(user.id, { password_hash: newHash })
+            // 2. Şifreyi güncelle
+            const { error: updateError } = await supabase.auth.updateUser({
+                password: newPassword
+            })
+
+            if (updateError) throw updateError
 
             setSuccess('Şifreniz başarıyla güncellendi')
             setCurrentPassword('')
@@ -48,6 +60,8 @@ export function PasswordChangeForm() {
             setConfirmPassword('')
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Bir hata oluştu')
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -88,9 +102,9 @@ export function PasswordChangeForm() {
                             required
                         />
                     </div>
-                    <Button type="submit">
+                    <Button type="submit" disabled={loading}>
                         <Save className="w-4 h-4 mr-2" />
-                        Şifreyi Güncelle
+                        {loading ? 'Güncelleniyor...' : 'Şifreyi Güncelle'}
                     </Button>
                 </form>
             </CardContent>

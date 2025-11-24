@@ -4,14 +4,14 @@ import { MapPicker } from "@/components/common/MapPicker"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useState } from "react"
 import { createProperty, createClient, uploadPropertyImages } from "@/lib/db"
-import type { Property } from "@/types"
-import { useAuth } from "@/contexts/AuthContext"
-import { ShieldAlert } from "lucide-react"
+// import type { Property } from "@/types"
+// import { useAuth } from "@/contexts/AuthContext"
+// import { ShieldAlert } from "lucide-react"
 
 export default function AddPage() {
     const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
     const [isSaving, setIsSaving] = useState(false)
-    const { user } = useAuth()
+    // const { user } = useAuth()
 
     const handlePropertySubmit = async (propertyData: any) => {
         setIsSaving(true)
