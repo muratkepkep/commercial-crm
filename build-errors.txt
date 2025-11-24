@@ -1,0 +1,66 @@
+﻿
+> commercial-crm@0.0.0 build
+> tsc -b && vite build
+
+src/components/admin/UserManagement.tsx(8,35): error TS2304: Cannot find name 'useAuth'.
+src/components/admin/UserManagement.tsx(9,31): error TS2304: Cannot find name 'useState'.
+src/components/admin/UserManagement.tsx(9,40): error TS2304: Cannot find name 'User'.
+src/components/admin/UserManagement.tsx(10,37): error TS2304: Cannot find name 'useState'.
+src/components/admin/UserManagement.tsx(11,39): error TS2304: Cannot find name 'useState'.
+src/components/admin/UserManagement.tsx(12,31): error TS2304: Cannot find name 'useState'.
+src/components/admin/UserManagement.tsx(13,35): error TS2304: Cannot find name 'useState'.
+src/components/admin/UserManagement.tsx(16,37): error TS2304: Cannot find name 'useState'.
+src/components/admin/UserManagement.tsx(20,27): error TS2304: Cannot find name 'UserRole'.
+src/components/admin/UserManagement.tsx(23,5): error TS2304: Cannot find name 'useEffect'.
+src/components/admin/UserManagement.tsx(28,32): error TS2304: Cannot find name 'getUsers'.
+src/components/admin/UserManagement.tsx(54,19): error TS6133: 'password_hash' is declared but its value is never read.
+src/components/admin/UserManagement.tsx(56,19): error TS2304: Cannot find name 'createUser'.
+src/components/admin/UserManagement.tsx(88,19): error TS2304: Cannot find name 'updateUser'.
+src/components/admin/UserManagement.tsx(101,19): error TS2304: Cannot find name 'deleteUser'.
+src/components/admin/UserManagement.tsx(109,30): error TS2304: Cannot find name 'User'.
+src/components/admin/UserManagement.tsx(127,22): error TS2304: Cannot find name 'Button'.
+src/components/admin/UserManagement.tsx(130,23): error TS2304: Cannot find name 'Button'.
+src/components/admin/UserManagement.tsx(143,38): error TS2304: Cannot find name 'Label'.
+src/components/admin/UserManagement.tsx(143,59): error TS2304: Cannot find name 'Label'.
+src/components/admin/UserManagement.tsx(144,38): error TS2304: Cannot find name 'Input'.
+src/components/admin/UserManagement.tsx(146,51): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/components/admin/UserManagement.tsx(150,38): error TS2304: Cannot find name 'Label'.
+src/components/admin/UserManagement.tsx(150,54): error TS2304: Cannot find name 'Label'.
+src/components/admin/UserManagement.tsx(151,38): error TS2304: Cannot find name 'Input'.
+src/components/admin/UserManagement.tsx(153,51): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/components/admin/UserManagement.tsx(159,38): error TS2304: Cannot find name 'Label'.
+src/components/admin/UserManagement.tsx(159,96): error TS2304: Cannot find name 'Label'.
+src/components/admin/UserManagement.tsx(160,38): error TS2304: Cannot find name 'Input'.
+src/components/admin/UserManagement.tsx(163,51): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/components/admin/UserManagement.tsx(167,38): error TS2304: Cannot find name 'Label'.
+src/components/admin/UserManagement.tsx(167,49): error TS2304: Cannot find name 'Label'.
+src/components/admin/UserManagement.tsx(168,38): error TS2304: Cannot find name 'Select'.
+src/components/admin/UserManagement.tsx(170,60): error TS2304: Cannot find name 'UserRole'.
+src/components/admin/UserManagement.tsx(172,42): error TS2304: Cannot find name 'SelectTrigger'.
+src/components/admin/UserManagement.tsx(173,46): error TS2304: Cannot find name 'SelectValue'.
+src/components/admin/UserManagement.tsx(174,43): error TS2304: Cannot find name 'SelectTrigger'.
+src/components/admin/UserManagement.tsx(175,42): error TS2304: Cannot find name 'SelectContent'.
+src/components/admin/UserManagement.tsx(176,46): error TS2304: Cannot find name 'SelectItem'.
+src/components/admin/UserManagement.tsx(176,89): error TS2304: Cannot find name 'SelectItem'.
+src/components/admin/UserManagement.tsx(177,46): error TS2304: Cannot find name 'SelectItem'.
+src/components/admin/UserManagement.tsx(177,80): error TS2304: Cannot find name 'SelectItem'.
+src/components/admin/UserManagement.tsx(178,46): error TS2304: Cannot find name 'SelectItem'.
+src/components/admin/UserManagement.tsx(178,82): error TS2304: Cannot find name 'SelectItem'.
+src/components/admin/UserManagement.tsx(179,43): error TS2304: Cannot find name 'SelectContent'.
+src/components/admin/UserManagement.tsx(180,39): error TS2304: Cannot find name 'Select'.
+src/components/admin/UserManagement.tsx(184,34): error TS2304: Cannot find name 'Button'.
+src/components/admin/UserManagement.tsx(184,86): error TS2304: Cannot find name 'Button'.
+src/components/admin/UserManagement.tsx(185,34): error TS2304: Cannot find name 'Button'.
+src/components/admin/UserManagement.tsx(188,35): error TS2304: Cannot find name 'Button'.
+src/components/admin/UserManagement.tsx(204,36): error TS7006: Parameter 'user' implicitly has an 'any' type.
+src/components/admin/UserManagement.tsx(215,42): error TS2304: Cannot find name 'Button'.
+src/components/admin/UserManagement.tsx(217,43): error TS2304: Cannot find name 'Button'.
+src/components/admin/UserManagement.tsx(219,46): error TS2304: Cannot find name 'Button'.
+src/components/admin/UserManagement.tsx(221,47): error TS2304: Cannot find name 'Button'.
+src/components/clients/ClientList.tsx(11,36): error TS6133: 'deleteClient' is declared but its value is never read.
+src/components/profile/PasswordChangeForm.tsx(36,67): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/components/todos/TodoList.tsx(57,17): error TS2353: Object literal may only specify known properties, and 'weekday' does not exist in type 'Partial<Todo>'.
+src/lib/local-db.ts(211,20): error TS18048: 'adminUser.password_hash' is possibly 'undefined'.
+src/pages/AddPage.tsx(9,1): error TS6133: 'ShieldAlert' is declared but its value is never read.
+src/pages/AddPage.tsx(14,11): error TS6133: 'user' is declared but its value is never read.

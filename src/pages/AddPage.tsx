@@ -3,7 +3,7 @@ import { AddClientForm } from "@/components/clients/AddClientForm"
 import { MapPicker } from "@/components/common/MapPicker"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useState } from "react"
-import { createProperty, createClient } from "@/lib/db"
+import { createProperty, createClient, uploadPropertyImages } from "@/lib/db"
 import type { Property } from "@/types"
 import { useAuth } from "@/contexts/AuthContext"
 import { ShieldAlert } from "lucide-react"
@@ -13,20 +13,38 @@ export default function AddPage() {
     const [isSaving, setIsSaving] = useState(false)
     const { user } = useAuth()
 
-    const handlePropertySubmit = async (propertyData: Partial<Property>) => {
+    const handlePropertySubmit = async (propertyData: any) => {
         setIsSaving(true)
         try {
+            // Extract image files
+            const imageFiles = propertyData._imageFiles as File[] | undefined
+            delete propertyData._imageFiles // Remove from property data
+
             const dataWithLocation = location
                 ? { ...propertyData, lat: location.lat, lng: location.lng }
                 : propertyData
 
-            const { data } = await createProperty({
+            const { data, error } = await createProperty({
                 ...dataWithLocation,
                 status: 'active'
             })
 
+            if (error) throw new Error(error)
+
             if (data) {
-                alert("✅ Mülk başarıyla kaydedildi!")
+                // Upload images if any
+                if (imageFiles && imageFiles.length > 0) {
+                    const { error: uploadError } = await uploadPropertyImages(data.id, imageFiles)
+                    if (uploadError) {
+                        console.error('Image upload error:', uploadError)
+                        alert("⚠️ Mülk kaydedildi ama görseller yüklenemedi. Lütfen düzenleyerek tekrar deneyin.")
+                    } else {
+                        alert(`✅ Mülk ve ${imageFiles.length} görsel başarıyla kaydedildi!`)
+                    }
+                } else {
+                    alert("✅ Mülk başarıyla kaydedildi!")
+                }
+
                 setLocation(null)
             }
             return data

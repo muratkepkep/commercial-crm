@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import type { User } from '@/types'
-import { pb } from '@/lib/pocketbase'
+import { supabase } from '@/lib/supabase'
 
 interface AuthContextType {
     user: User | null
-    login: (username: string, password: string) => Promise<boolean>
-    logout: () => void
+    login: (email: string, password: string) => Promise<boolean>
+    logout: () => Promise<void>
     isAuthenticated: boolean
 }
 
@@ -16,30 +16,54 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
-        // PocketBase authStore'dan mevcut kullanıcıyı yükle
-        const authData = pb.authStore.model
-        if (authData && pb.authStore.isValid) {
-            setUser(authData as User)
-        }
-        setIsLoading(false)
+        // Supabase session'ı kontrol et
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session?.user) {
+                setUser({
+                    id: session.user.id,
+                    email: session.user.email,
+                    role: 'admin', // Default role, profiles tablosundan çekilebilir
+                    created_at: session.user.created_at
+                } as User)
+            }
+            setIsLoading(false)
+        })
 
         // Auth state değişikliklerini dinle
-        const unsubscribe = pb.authStore.onChange((_token, model) => {
-            setUser(model as User | null)
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            if (session?.user) {
+                setUser({
+                    id: session.user.id,
+                    email: session.user.email,
+                    role: 'admin',
+                    created_at: session.user.created_at
+                } as User)
+            } else {
+                setUser(null)
+            }
         })
 
         return () => {
-            unsubscribe()
+            subscription.unsubscribe()
         }
     }, [])
 
-    const login = async (username: string, password: string): Promise<boolean> => {
+    const login = async (email: string, password: string): Promise<boolean> => {
         try {
-            // PocketBase ile login (username veya email ile giriş yapılabilir)
-            const authData = await pb.collection('users').authWithPassword(username, password)
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password
+            })
 
-            if (authData.record) {
-                setUser(authData.record as User)
+            if (error) throw error
+
+            if (data.user) {
+                setUser({
+                    id: data.user.id,
+                    email: data.user.email,
+                    role: 'admin',
+                    created_at: data.user.created_at
+                } as User)
                 return true
             }
             return false
@@ -49,8 +73,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }
 
-    const logout = () => {
-        pb.authStore.clear()
+    const logout = async () => {
+        await supabase.auth.signOut()
         setUser(null)
     }
 

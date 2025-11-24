@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { PropertyForm } from "./PropertyForm"
-import { getPropertyImages, getPropertyImageUrl, deletePropertyImage } from "@/lib/db"
+import { deleteImages } from "@/lib/supabase-storage"
 import type { Property } from "@/types"
 import { useAuth } from "@/contexts/AuthContext"
 import { canEdit, canDelete } from "@/lib/auth"
@@ -16,47 +16,14 @@ interface PropertyListProps {
     onDelete?: (id: string) => void
 }
 
-interface PropertyImage {
-    id: string
-    storage_path: string
-    file_name: string
-    display_order: number
-}
-
 export function PropertyList({ properties = [], onDelete }: PropertyListProps) {
     const [editingProperty, setEditingProperty] = React.useState<Property | null>(null)
     const [imageIndexes, setImageIndexes] = React.useState<Record<string, number>>({})
-    const [propertyImages, setPropertyImages] = React.useState<Record<string, PropertyImage[]>>({})
     const { user } = useAuth()
-
-    // Fetch images from property_images table
-    React.useEffect(() => {
-        const loadImages = async () => {
-            const imagesMap: Record<string, PropertyImage[]> = {}
-
-            for (const property of properties) {
-                const { data } = await getPropertyImages(property.id)
-                if (data && data.length > 0) {
-                    imagesMap[property.id] = data
-                }
-            }
-
-            setPropertyImages(imagesMap)
-        }
-
-        if (properties.length > 0) {
-            loadImages()
-        }
-    }, [properties])
 
     const handleShare = (property: Property) => {
         const typeLabel = property.property_type === "satilik" ? "SATILIK" : "KİRALIK"
-
-        // Get images from state
-        const images = propertyImages[property.id] || []
-        const imageUrls = images.map(img => getPropertyImageUrl(img.storage_path))
-
-        let text = `
+        const text = `
 🏭 *${property.title}* (${typeLabel})
 
 📐 *Kapalı Alan:* ${property.closed_area_m2} m²
@@ -69,10 +36,6 @@ ${property.ada && property.parsel ? `📍 *Ada-Parsel:* ${property.ada}/${proper
 Detaylar için arayınız.
     `.trim()
 
-        if (imageUrls.length > 0) {
-            text += `\\n\\n📸 *Görseller:*\\n${imageUrls.slice(0, 3).join('\\n')}`
-        }
-
         const url = `https://wa.me/?text=${encodeURIComponent(text)}`
         window.open(url, '_blank')
     }
@@ -81,9 +44,8 @@ Detaylar için arayınız.
         if (!confirm(`"${property.title}" mülkü silinsin mi?`)) return
 
         try {
-            const images = propertyImages[property.id] || []
-            for (const img of images) {
-                await deletePropertyImage(img.id, img.storage_path)
+            if (property.image_urls && property.image_urls.length > 0) {
+                await deleteImages(property.image_urls)
             }
             onDelete?.(property.id)
         } catch (error) {
@@ -123,8 +85,7 @@ Detaylar için arayınız.
                     <AnimatePresence mode="popLayout">
                         {properties.map((property) => {
                             const currentImageIndex = getCurrentImageIndex(property.id)
-                            const images = propertyImages[property.id] || []
-                            const hasImages = images.length > 0
+                            const hasImages = property.image_urls && property.image_urls.length > 0
 
                             return (
                                 <motion.div
@@ -139,17 +100,17 @@ Detaylar için arayınız.
                                         {hasImages && (
                                             <div className="relative h-48 bg-muted">
                                                 <img
-                                                    src={getPropertyImageUrl(images[currentImageIndex].storage_path)}
+                                                    src={property.image_urls![currentImageIndex]}
                                                     alt={property.title}
                                                     className="w-full h-full object-cover"
                                                 />
-                                                {images.length > 1 && (
+                                                {property.image_urls!.length > 1 && (
                                                     <>
                                                         <Button
                                                             size="icon"
                                                             variant="secondary"
                                                             className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full"
-                                                            onClick={() => prevImage(property.id, images.length)}
+                                                            onClick={() => prevImage(property.id, property.image_urls!.length)}
                                                         >
                                                             <ChevronLeft className="h-4 w-4" />
                                                         </Button>
@@ -157,12 +118,12 @@ Detaylar için arayınız.
                                                             size="icon"
                                                             variant="secondary"
                                                             className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full"
-                                                            onClick={() => nextImage(property.id, images.length)}
+                                                            onClick={() => nextImage(property.id, property.image_urls!.length)}
                                                         >
                                                             <ChevronRight className="h-4 w-4" />
                                                         </Button>
                                                         <div className="absolute bottom-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
-                                                            {currentImageIndex + 1} / {images.length}
+                                                            {currentImageIndex + 1} / {property.image_urls!.length}
                                                         </div>
                                                     </>
                                                 )}

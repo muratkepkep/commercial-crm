@@ -85,16 +85,6 @@ export function PropertyForm({ initialData, onSubmit, isLoading }: PropertyFormP
         setExistingImages(prev => prev.filter((_, i) => i !== index))
     }
 
-    // Convert File to base64
-    const fileToBase64 = (file: File): Promise<string> => {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader()
-            reader.onload = () => resolve(reader.result as string)
-            reader.onerror = reject
-            reader.readAsDataURL(file)
-        })
-    }
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
@@ -104,15 +94,6 @@ export function PropertyForm({ initialData, onSubmit, isLoading }: PropertyFormP
         }
 
         try {
-            // Convert new images to base64 if any
-            let base64Images: string[] = []
-            if (selectedFiles.length > 0) {
-                base64Images = await Promise.all(selectedFiles.map(file => fileToBase64(file)))
-            }
-
-            // Combine existing and new image base64 strings
-            const allImageUrls = [...existingImages, ...base64Images]
-
             const propertyData: Partial<Property> = {
                 title,
                 description: description || undefined,
@@ -125,7 +106,8 @@ export function PropertyForm({ initialData, onSubmit, isLoading }: PropertyFormP
                 power_kw: power ? parseFloat(power) : undefined,
                 ada: ada || undefined,
                 parsel: parsel || undefined,
-                image_urls: allImageUrls.length > 0 ? allImageUrls : undefined,
+                // Images will be uploaded separately by parent component
+                _imageFiles: selectedFiles.length > 0 ? selectedFiles : undefined,
             }
 
             await onSubmit(propertyData)
@@ -291,9 +273,9 @@ Detaylar için arayınız.`.trim()
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="images">Görseller (Base64 olarak kaydedilir)</Label>
+                    <Label htmlFor="images">Görseller (Supabase Storage)</Label>
                     <Input ref={fileInputRef} id="images" type="file" accept="image/*" multiple className="cursor-pointer" onChange={handleFileSelect} />
-                    <p className="text-xs text-muted-foreground">Birden fazla görsel seçebilirsiniz - LocalStorage'a base64 olarak kaydedilir</p>
+                    <p className="text-xs text-muted-foreground">Birden fazla görsel seçebilirsiniz - Supabase Storage'a yüklenecek</p>
 
                     {existingImages.length > 0 && (
                         <div className="flex flex-wrap gap-2 mt-2">
