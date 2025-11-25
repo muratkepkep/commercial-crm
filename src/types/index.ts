@@ -72,6 +72,13 @@ export interface Property {
     // Factory/Warehouse specific
     crane?: boolean;
     entrance_height_m?: number;
+    // Additional fields
+    ground_loading?: boolean;
+    zoning_status?: string;
+    gabari?: number;
+    kak?: number;
+    administrative_building?: boolean;
+    image_urls?: string[];
     // Status and ownership
     status: 'active' | 'sold' | 'rented';
     property_owner_id?: string; // References client with role 'ev_sahibi'

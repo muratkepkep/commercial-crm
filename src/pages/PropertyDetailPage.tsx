@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { ChevronLeft, MapPin, Building2, Share2, Pencil, Trash2, Calendar, Ruler, Zap, ArrowUpFromLine, ChevronRight } from "lucide-react"
+import { ChevronLeft, MapPin, Building2, Share2, Pencil, Trash2, Calendar, Zap, ArrowUpFromLine, ChevronRight } from "lucide-react"
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
@@ -205,7 +205,7 @@ Detaylar için: ${window.location.href}
                                 <p className="font-medium">{property.height_m} m</p>
                             </div>
                         </div>
-                        )}
+
 
                         {property.power_kw && (
                             <div className="flex items-center gap-3">
