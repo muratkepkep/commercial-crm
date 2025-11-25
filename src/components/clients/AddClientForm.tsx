@@ -75,11 +75,10 @@ export function AddClientForm({ initialData, onSubmit, onCancel }: AddClientForm
                 </div>
 
                 <div className="space-y-2">
-                    <Label>Ne Yapmak İstiyor?</Label>
-                    <Select value={clientIntent} onValueChange={(v) => setClientIntent(v as ClientIntent)}>
-                        <SelectTrigger><SelectValue placeholder="Seçiniz (İsteğe bağlı)" /></SelectTrigger>
+                    <Label>Ne Yapmak İstiyor? (İsteğe bağlı)</Label>
+                    <Select value={clientIntent || undefined} onValueChange={(v) => setClientIntent(v as ClientIntent)}>
+                        <SelectTrigger><SelectValue placeholder="Seçiniz" /></SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="">-- Seçiniz --</SelectItem>
                             <SelectItem value="almak_istiyor">Almak İstiyor (Satın Almak)</SelectItem>
                             <SelectItem value="satmak_istiyor">Satmak İstiyor</SelectItem>
                             <SelectItem value="kiralamak_istiyor">Kiralamak İstiyor (Kiracı Olarak)</SelectItem>
