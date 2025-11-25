@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { BottomNav } from "@/components/common/BottomNav"
 import ClientsPage from "@/pages/ClientsPage"
 import PropertiesPage from "@/pages/PropertiesPage"
+import PropertyDetailPage from "@/pages/PropertyDetailPage"
 import AddPage from "@/pages/AddPage"
 import TodosPage from "@/pages/TodosPage"
 import NotesPage from "@/pages/NotesPage"
@@ -22,6 +23,7 @@ function App() {
 
               <Route path="/" element={<ProtectedRoute><ClientsPage /></ProtectedRoute>} />
               <Route path="/properties" element={<ProtectedRoute><PropertiesPage /></ProtectedRoute>} />
+              <Route path="/properties/:id" element={<ProtectedRoute><PropertyDetailPage /></ProtectedRoute>} />
               <Route path="/add" element={<ProtectedRoute><AddPage /></ProtectedRoute>} />
               <Route path="/todos" element={<ProtectedRoute><TodosPage /></ProtectedRoute>} />
               <Route path="/notes" element={<ProtectedRoute><NotesPage /></ProtectedRoute>} />

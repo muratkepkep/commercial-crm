@@ -58,13 +58,20 @@ export interface Property {
     open_area_m2?: number;
     height_m?: number;
     power_kw?: number;
-    column_spacing?: string;
-    floor_load_ton_m2?: number;
-    has_crane?: boolean;
 
-    // Media
-    image_urls?: string[];
+    // Apartment/Office specific
+    room_count?: string;
+    floor_number?: number;
+    building_age?: string;
+    heating_type?: string;
+    balcony?: boolean;
+    elevator?: boolean;
+    furnished?: boolean;
+    parking_spots?: number;
 
+    // Factory/Warehouse specific
+    crane?: boolean;
+    entrance_height_m?: number;
     // Status and ownership
     status: 'active' | 'sold' | 'rented';
     property_owner_id?: string; // References client with role 'ev_sahibi'

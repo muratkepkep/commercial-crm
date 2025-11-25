@@ -1,5 +1,6 @@
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useNavigate } from "react-router-dom"
 import { Building2, MapPin, DollarSign, Share2, Pencil, Trash2, ChevronLeft, ChevronRight } from "lucide-react"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -28,6 +29,7 @@ export function PropertyList({ properties = [], onDelete }: PropertyListProps) {
     const [imageIndexes, setImageIndexes] = React.useState<Record<string, number>>({})
     const [propertyImages, setPropertyImages] = React.useState<Record<string, PropertyImage[]>>({})
     const { user } = useAuth()
+    const navigate = useNavigate()
 
     // Fetch images from property_images table
     React.useEffect(() => {
@@ -126,7 +128,10 @@ Detaylar için arayınız.
                                     exit={{ opacity: 0, scale: 0.95 }}
                                     transition={{ duration: 0.2 }}
                                 >
-                                    <Card className="overflow-hidden border-none shadow-md bg-white/80 dark:bg-black/40 backdrop-blur-md">
+                                    <Card
+                                        className="overflow-hidden border-none shadow-md bg-white/80 dark:bg-black/40 backdrop-blur-md cursor-pointer hover:shadow-lg transition-shadow"
+                                        onClick={() => navigate(`/properties/${property.id}`)}
+                                    >
                                         {hasImages && (
                                             <div className="relative h-48 bg-muted">
                                                 <img

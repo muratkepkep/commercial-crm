@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -7,6 +8,7 @@ import { IndustrialCalculator } from "./IndustrialCalculator"
 import type { Property, PropertyCategory, ListingType, Client } from "@/types"
 import { X } from "lucide-react"
 import { getClientsByRole } from "@/lib/db"
+import { MapPicker } from "./MapPicker"
 
 interface PropertyFormProps {
     initialData?: Partial<Property>
@@ -40,6 +42,27 @@ export function PropertyForm({ initialData, onSubmit, isLoading }: PropertyFormP
     const [power, setPower] = React.useState(initialData?.power_kw?.toString() || "")
     const [ada, setAda] = React.useState(initialData?.ada || "")
     const [parsel, setParsel] = React.useState(initialData?.parsel || "")
+
+    // Category specific fields
+    const [roomCount, setRoomCount] = React.useState(initialData?.room_count || "")
+    const [floorNumber, setFloorNumber] = React.useState(initialData?.floor_number?.toString() || "")
+    const [buildingAge, setBuildingAge] = React.useState(initialData?.building_age || "")
+    const [heatingType, setHeatingType] = React.useState(initialData?.heating_type || "")
+    const [balcony, setBalcony] = React.useState(initialData?.balcony || false)
+    const [elevator, setElevator] = React.useState(initialData?.elevator || false)
+    const [furnished, setFurnished] = React.useState(initialData?.furnished || false)
+    const [parkingSpots, setParkingSpots] = React.useState(initialData?.parking_spots?.toString() || "")
+    const [crane, setCrane] = React.useState(initialData?.crane || false)
+    const [entranceHeight, setEntranceHeight] = React.useState(initialData?.entrance_height_m?.toString() || "")
+    const [groundLoading, setGroundLoading] = React.useState(initialData?.ground_loading || false)
+    const [zoningStatus, setZoningStatus] = React.useState(initialData?.zoning_status || "")
+    const [gabari, setGabari] = React.useState(initialData?.gabari?.toString() || "")
+    const [kak, setKak] = React.useState(initialData?.kak?.toString() || "")
+    const [administrativeBuilding, setAdministrativeBuilding] = React.useState(initialData?.administrative_building || false)
+
+    const [lat, setLat] = React.useState<number | undefined>(initialData?.lat)
+    const [lng, setLng] = React.useState<number | undefined>(initialData?.lng)
+
     const [selectedFiles, setSelectedFiles] = React.useState<File[]>([])
     const [existingImages, setExistingImages] = React.useState<string[]>(initialData?.image_urls || [])
     const fileInputRef = React.useRef<HTMLInputElement>(null)
@@ -135,6 +158,25 @@ export function PropertyForm({ initialData, onSubmit, isLoading }: PropertyFormP
                 ada: ada || undefined,
                 parsel: parsel || undefined,
                 property_owner_id: (listingType === "kiralik" && propertyOwnerId) ? propertyOwnerId : undefined,
+
+                // New fields
+                room_count: roomCount || undefined,
+                floor_number: floorNumber ? parseInt(floorNumber) : undefined,
+                building_age: buildingAge || undefined,
+                heating_type: heatingType || undefined,
+                balcony,
+                elevator,
+                furnished,
+                parking_spots: parkingSpots ? parseInt(parkingSpots) : undefined,
+                crane,
+                entrance_height_m: entranceHeight ? parseFloat(entranceHeight) : undefined,
+                ground_loading: groundLoading,
+                zoning_status: zoningStatus || undefined,
+                gabari: gabari ? parseFloat(gabari) : undefined,
+                kak: kak ? parseFloat(kak) : undefined,
+                administrative_building: administrativeBuilding,
+                lat,
+                lng,
             }
 
             // Attach image files (handled by parent component)
@@ -169,6 +211,21 @@ export function PropertyForm({ initialData, onSubmit, isLoading }: PropertyFormP
         setPower("")
         setAda("")
         setParsel("")
+        setRoomCount("")
+        setFloorNumber("")
+        setBuildingAge("")
+        setHeatingType("")
+        setBalcony(false)
+        setElevator(false)
+        setFurnished(false)
+        setParkingSpots("")
+        setCrane(false)
+        setAdministrativeBuilding(false)
+        setEntranceHeight("")
+        setGroundLoading(false)
+        setZoningStatus("")
+        setGabari("")
+        setKak("")
         setSelectedFiles([])
         setExistingImages([])
         if (fileInputRef.current) fileInputRef.current.value = ""
@@ -365,8 +422,155 @@ Detaylar için arayınız.`.trim()
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="parsel">Parsel</Label>
-                        <Input id="parsel" value={parsel} onChange={(e) => setParsel(e.target.value)} placeholder="45" />
+                        <Input id="parsel" value={parsel} onChange={(e) => setParsel(e.target.value)} placeholder="4" />
                     </div>
+                </div>
+
+                {/* Category Specific Fields */}
+                {(propertyCategory === 'daire' || propertyCategory === 'ofis') && (
+                    <div className="space-y-4 border p-4 rounded-lg bg-muted/30">
+                        <h3 className="font-semibold text-sm">Daire/Ofis Detayları</h3>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label>Oda Sayısı</Label>
+                                <Select value={roomCount} onValueChange={setRoomCount}>
+                                    <SelectTrigger><SelectValue placeholder="Seçiniz" /></SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="1+0">1+0</SelectItem>
+                                        <SelectItem value="1+1">1+1</SelectItem>
+                                        <SelectItem value="2+1">2+1</SelectItem>
+                                        <SelectItem value="3+1">3+1</SelectItem>
+                                        <SelectItem value="4+1">4+1</SelectItem>
+                                        <SelectItem value="5+1">5+1</SelectItem>
+                                        <SelectItem value="5+2">5+2</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Bulunduğu Kat</Label>
+                                <Input type="number" value={floorNumber} onChange={(e) => setFloorNumber(e.target.value)} placeholder="3" />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Isıtma Tipi</Label>
+                                <Select value={heatingType} onValueChange={setHeatingType}>
+                                    <SelectTrigger><SelectValue placeholder="Seçiniz" /></SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="kombi">Kombi</SelectItem>
+                                        <SelectItem value="merkezi">Merkezi</SelectItem>
+                                        <SelectItem value="yerden">Yerden Isıtma</SelectItem>
+                                        <SelectItem value="klima">Klima</SelectItem>
+                                        <SelectItem value="soba">Soba</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            {propertyCategory === 'daire' && (
+                                <div className="space-y-2">
+                                    <Label>Bina Yaşı</Label>
+                                    <Select value={buildingAge} onValueChange={setBuildingAge}>
+                                        <SelectTrigger><SelectValue placeholder="Seçiniz" /></SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="0">0 (Yeni)</SelectItem>
+                                            <SelectItem value="1-5">1-5 Yıl</SelectItem>
+                                            <SelectItem value="5-10">5-10 Yıl</SelectItem>
+                                            <SelectItem value="10-20">10-20 Yıl</SelectItem>
+                                            <SelectItem value="20+">20+ Yıl</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            )}
+                        </div>
+                        <div className="flex flex-wrap gap-4">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" checked={elevator} onChange={(e) => setElevator(e.target.checked)} className="w-4 h-4" />
+                                <span className="text-sm">Asansör</span>
+                            </label>
+                            {propertyCategory === 'daire' && (
+                                <>
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" checked={balcony} onChange={(e) => setBalcony(e.target.checked)} className="w-4 h-4" />
+                                        <span className="text-sm">Balkon</span>
+                                    </label>
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" checked={furnished} onChange={(e) => setFurnished(e.target.checked)} className="w-4 h-4" />
+                                        <span className="text-sm">Eşyalı</span>
+                                    </label>
+                                </>
+                            )}
+                            {propertyCategory === 'ofis' && (
+                                <div className="flex items-center gap-2">
+                                    <Label className="whitespace-nowrap">Otopark (Araç)</Label>
+                                    <Input type="number" className="w-20 h-8" value={parkingSpots} onChange={(e) => setParkingSpots(e.target.value)} />
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {(propertyCategory === 'fabrika' || propertyCategory === 'depo') && (
+                    <div className="space-y-4 border p-4 rounded-lg bg-muted/30">
+                        <h3 className="font-semibold text-sm">Fabrika/Depo Detayları</h3>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label>Giriş Yüksekliği (m)</Label>
+                                <Input type="number" value={entranceHeight} onChange={(e) => setEntranceHeight(e.target.value)} placeholder="5" />
+                            </div>
+                            <div className="flex flex-col gap-2 pt-6">
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" checked={crane} onChange={(e) => setCrane(e.target.checked)} className="w-4 h-4" />
+                                    <span className="text-sm">Vinç Var</span>
+                                </label>
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" checked={administrativeBuilding} onChange={(e) => setAdministrativeBuilding(e.target.checked)} className="w-4 h-4" />
+                                    <span className="text-sm">İdari Bina Mevcut</span>
+                                </label>
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" checked={groundLoading} onChange={(e) => setGroundLoading(e.target.checked)} className="w-4 h-4" />
+                                    <span className="text-sm">Zemin Yüklemesi Uygun</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {(propertyCategory === 'arsa' || propertyCategory === 'arazi') && (
+                    <div className="space-y-4 border p-4 rounded-lg bg-muted/30">
+                        <h3 className="font-semibold text-sm">Arsa/Arazi Detayları</h3>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label>İmar Durumu</Label>
+                                <Select value={zoningStatus} onValueChange={setZoningStatus}>
+                                    <SelectTrigger><SelectValue placeholder="Seçiniz" /></SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="konut">Konut</SelectItem>
+                                        <SelectItem value="ticari">Ticari</SelectItem>
+                                        <SelectItem value="sanayi">Sanayi</SelectItem>
+                                        <SelectItem value="tarla">Tarla</SelectItem>
+                                        <SelectItem value="bag_bahce">Bağ/Bahçe</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Gabari</Label>
+                                <Input type="number" value={gabari} onChange={(e) => setGabari(e.target.value)} placeholder="6.50" />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>KAK (Emsal)</Label>
+                                <Input type="number" value={kak} onChange={(e) => setKak(e.target.value)} placeholder="1.5" />
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                <div className="space-y-2">
+                    <Label>Konum Seçimi</Label>
+                    <MapPicker
+                        lat={lat}
+                        lng={lng}
+                        onLocationSelect={(newLat, newLng) => {
+                            setLat(newLat)
+                            setLng(newLng)
+                        }}
+                    />
                 </div>
 
                 <div className="space-y-2">
@@ -405,6 +609,6 @@ Detaylar için arayınız.`.trim()
                     {isLoading ? "Kaydediliyor..." : "Kaydet"}
                 </Button>
             </div>
-        </form>
+        </form >
     )
 }
