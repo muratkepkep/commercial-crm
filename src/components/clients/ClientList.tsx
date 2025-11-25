@@ -56,7 +56,13 @@ export function ClientList() {
         }
     }
 
-    const getRoleLabel = (role: ClientRole) => role === "alici" ? "Alıcı" : role === "satici" ? "Satıcı" : "Kiracı"
+    const getRoleLabel = (role: ClientRole) => {
+        if (role === "alici") return "Alıcı"
+        if (role === "satici") return "Satıcı"
+        if (role === "kiraci") return "Kiracı"
+        if (role === "ev_sahibi") return "Ev Sahibi"
+        return "Bilinmiyor"
+    }
 
     if (loading) {
         return (
@@ -85,11 +91,12 @@ export function ClientList() {
             </div>
 
             <Tabs defaultValue="all" onValueChange={(v) => setFilter(v as any)} className="w-full">
-                <TabsList className="w-full grid grid-cols-4 p-1 bg-muted/50 backdrop-blur-sm">
+                <TabsList className="w-full grid grid-cols-5 p-1 bg-muted/50 backdrop-blur-sm">
                     <TabsTrigger value="all" className="text-xs">TÜMÜ</TabsTrigger>
                     <TabsTrigger value="alici" className="text-xs">ALICI</TabsTrigger>
                     <TabsTrigger value="satici" className="text-xs">SATICI</TabsTrigger>
                     <TabsTrigger value="kiraci" className="text-xs">KİRACI</TabsTrigger>
+                    <TabsTrigger value="ev_sahibi" className="text-xs">EV SAHİBİ</TabsTrigger>
                 </TabsList>
             </Tabs>
 
