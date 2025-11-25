@@ -160,40 +160,59 @@ Detaylar için arayınız.
                                             </div>
                                         )}
                                         <CardHeader className="pb-3">
-                                            <div className="flex items-start justify-between">
-                                                <div className="space-y-1">
+                                            <div className="flex items-start justify-between gap-2">
+                                                <div className="space-y-2 flex-1">
+                                                    <div className="flex gap-2 flex-wrap">
+                                                        {property.property_category && (
+                                                            <Badge variant="outline" className="text-xs">
+                                                                {property.property_category === 'daire' ? '🏠 Daire' :
+                                                                    property.property_category === 'fabrika' ? '🏭 Fabrika' :
+                                                                        property.property_category === 'arsa' ? '🌾 Arsa' :
+                                                                            property.property_category === 'ofis' ? '🏢 Ofis' :
+                                                                                property.property_category === 'depo' ? '📦 Depo' : '🌳 Arazi'}
+                                                            </Badge>
+                                                        )}
+                                                        <Badge variant={property.listing_type === "satilik" || property.property_type === "satilik" ? "default" : "secondary"}>
+                                                            {property.listing_type === "satilik" || property.property_type === "satilik" ? "Satılık" : "Kiralık"}
+                                                        </Badge>
+                                                    </div>
                                                     <h3 className="font-semibold leading-none">{property.title}</h3>
+                                                    {(property.city || property.district) && (
+                                                        <p className="text-sm text-muted-foreground flex items-center gap-1">
+                                                            <MapPin className="h-3 w-3" />
+                                                            {property.district && property.city ? `${property.district}, ${property.city}` : property.city || property.district}
+                                                        </p>
+                                                    )}
                                                     {property.description && (
                                                         <p className="text-sm text-muted-foreground">{property.description}</p>
                                                     )}
                                                 </div>
-                                                <Badge variant={property.property_type === "satilik" ? "default" : "secondary"}>
-                                                    {property.property_type === "satilik" ? "Satılık" : "Kiralık"}
-                                                </Badge>
                                             </div>
                                         </CardHeader>
                                         <CardContent className="pb-3">
-                                            <div className="grid grid-cols-2 gap-3 text-sm">
+                                            <div className="grid grid-cols-2 gap-2 text-sm">
                                                 {property.closed_area_m2 && (
                                                     <div className="flex items-center gap-2">
                                                         <Building2 className="h-4 w-4 text-muted-foreground" />
-                                                        <span>{property.closed_area_m2} m²</span>
+                                                        <span className="font-medium">Kapalı: {property.closed_area_m2} m²</span>
+                                                    </div>
+                                                )}
+                                                {property.open_area_m2 && (
+                                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                                        <span>🌳 Açık: {property.open_area_m2} m²</span>
                                                     </div>
                                                 )}
                                                 {property.price && (
-                                                    <div className="flex items-center gap-2">
+                                                    <div className="flex items-center gap-2 col-span-2">
                                                         <DollarSign className="h-4 w-4 text-muted-foreground" />
                                                         <span className="font-semibold text-primary">
                                                             {property.price.toLocaleString('tr-TR')} {property.currency}
                                                         </span>
                                                     </div>
                                                 )}
-                                                {(property.lat && property.lng) && (
-                                                    <div className="flex items-center gap-2">
-                                                        <MapPin className="h-4 w-4 text-muted-foreground" />
-                                                        <span className="text-xs text-muted-foreground">
-                                                            {property.lat.toFixed(4)}, {property.lng.toFixed(4)}
-                                                        </span>
+                                                {property.height_m && (
+                                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                                        <span>🏗 Yükseklik: {property.height_m} m</span>
                                                     </div>
                                                 )}
                                                 {property.power_kw && (
@@ -201,9 +220,9 @@ Detaylar için arayınız.
                                                         <span>⚡ {property.power_kw} kW</span>
                                                     </div>
                                                 )}
-                                                {(property.ada || property.parsel) && (
-                                                    <div className="flex items-center gap-2 text-muted-foreground">
-                                                        <span>📍 Ada: {property.ada || '-'} / Parsel: {property.parsel || '-'}</span>
+                                                {(property.ada && property.parsel) && (
+                                                    <div className="flex items-center gap-2 text-xs text-muted-foreground col-span-2">
+                                                        <span>📍 Ada: {property.ada} / Parsel: {property.parsel}</span>
                                                     </div>
                                                 )}
                                             </div>

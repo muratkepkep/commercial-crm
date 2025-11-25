@@ -1,4 +1,4 @@
-import { Home, Building2, PlusCircle, CheckSquare, User } from "lucide-react"
+import { Home, Building2, PlusCircle, StickyNote, Calendar } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import { cn } from "@/lib/utils"
 
@@ -6,8 +6,8 @@ const navItems = [
     { label: "Müşteriler", icon: Home, path: "/" },
     { label: "Portföy", icon: Building2, path: "/properties" },
     { label: "Ekle", icon: PlusCircle, path: "/add" },
-    { label: "To-Do", icon: CheckSquare, path: "/todos" },
-    { label: "Profil", icon: User, path: "/profile" },
+    { label: "Notlar", icon: StickyNote, path: "/notes" },
+    { label: "Planlar", icon: Calendar, path: "/plans" },
 ]
 
 export function BottomNav() {
