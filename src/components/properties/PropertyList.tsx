@@ -51,12 +51,7 @@ export function PropertyList({ properties = [], onDelete }: PropertyListProps) {
 
     const handleShare = (property: Property) => {
         const typeLabel = property.property_type === "satilik" ? "SATILIK" : "KİRALIK"
-
-        // Get images from state
-        const images = propertyImages[property.id] || []
-        const imageUrls = images.map(img => getPropertyImageUrl(img.storage_path))
-
-        let text = `
+        const text = `
 🏭 *${property.title}* (${typeLabel})
 
 📐 *Kapalı Alan:* ${property.closed_area_m2} m²
@@ -68,10 +63,6 @@ ${property.ada && property.parsel ? `📍 *Ada-Parsel:* ${property.ada}/${proper
 
 Detaylar için arayınız.
     `.trim()
-
-        if (imageUrls.length > 0) {
-            text += `\\n\\n📸 *Görseller:*\\n${imageUrls.slice(0, 3).join('\\n')}`
-        }
 
         const url = `https://wa.me/?text=${encodeURIComponent(text)}`
         window.open(url, '_blank')
@@ -210,6 +201,11 @@ Detaylar için arayınız.
                                                         <span>⚡ {property.power_kw} kW</span>
                                                     </div>
                                                 )}
+                                                {(property.ada || property.parsel) && (
+                                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                                        <span>📍 Ada: {property.ada || '-'} / Parsel: {property.parsel || '-'}</span>
+                                                    </div>
+                                                )}
                                             </div>
                                         </CardContent>
                                         <CardFooter className="gap-2 pt-3">
@@ -247,7 +243,12 @@ Detaylar için arayınız.
                             onSubmit={async (updatedData) => {
                                 try {
                                     console.log('🔵 Updating property:', editingProperty.id, updatedData)
-                                    const { updateProperty } = await import('@/lib/db')
+
+                                    // Extract image files before update
+                                    const imageFiles = (updatedData as any)._imageFiles as File[] | undefined
+                                    delete (updatedData as any)._imageFiles // Remove from property data
+
+                                    const { updateProperty, uploadPropertyImages } = await import('@/lib/db')
                                     const { error } = await updateProperty(editingProperty.id, updatedData)
 
                                     if (error) {
@@ -256,8 +257,19 @@ Detaylar için arayınız.
                                         return
                                     }
 
+                                    // Upload new images if any
+                                    if (imageFiles && imageFiles.length > 0) {
+                                        const { error: uploadError } = await uploadPropertyImages(editingProperty.id, imageFiles)
+                                        if (uploadError) {
+                                            console.error('Image upload error:', uploadError)
+                                            alert("⚠️ Mülk güncellendi ama görseller yüklenemedi.")
+                                        } else {
+                                            console.log(`✅ ${imageFiles.length} görsel yüklendi`)
+                                        }
+                                    }
+
                                     console.log('✅ Property updated successfully')
-                                    alert('✅ Mülk güncellendi!')
+                                    alert('✅ Mülk başarıyla güncellendi!')
                                     setEditingProperty(null)
 
                                     // Listeyi yenile
