@@ -54,11 +54,12 @@ UPDATE properties
 SET property_category = 'fabrika'::property_category
 WHERE property_category IS NULL;
 
--- STEP 3: Add new column to CLIENTS table
+-- STEP 3: Add new columns to CLIENTS table
 -- ===================================
 
 ALTER TABLE clients 
-ADD COLUMN IF NOT EXISTS client_intent client_intent;
+ADD COLUMN IF NOT EXISTS client_intent client_intent,
+ADD COLUMN IF NOT EXISTS owned_property_info TEXT;
 
 -- STEP 4: Create NOTES table
 -- ===================================
