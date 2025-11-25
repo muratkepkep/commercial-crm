@@ -1,6 +1,6 @@
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Plus, Phone, Briefcase, Factory } from "lucide-react"
+import { Plus, Phone, Briefcase, Factory, Pencil, Building2 } from "lucide-react"
 import type { Client, ClientRole } from "@/types"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -8,13 +8,14 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { AddClientForm } from "./AddClientForm"
-import { getClients, createClient } from "@/lib/db"
+import { getClients, createClient, updateClient } from "@/lib/db"
 
 export function ClientList() {
     const [clients, setClients] = React.useState<Client[]>([])
     const [loading, setLoading] = React.useState(true)
     const [filter, setFilter] = React.useState<ClientRole | "all">("all")
     const [isAddOpen, setIsAddOpen] = React.useState(false)
+    const [editingClient, setEditingClient] = React.useState<Client | null>(null)
 
     const loadClients = async () => {
         try {
@@ -53,6 +54,25 @@ export function ClientList() {
         } catch (error: any) {
             console.error('🔴 Exception in handleAddClient:', error)
             alert(`❌ Hata: ${error.message || 'Beklenmeyen hata'}`)
+        }
+    }
+
+    const handleEditClient = async (data: any) => {
+        if (!editingClient) return
+
+        try {
+            const result = await updateClient(editingClient.id, data)
+            if (result.error) {
+                alert(`❌ Hata: ${result.error.message || JSON.stringify(result.error)}`)
+                return
+            }
+
+            await loadClients()
+            setEditingClient(null)
+            alert("✅ Müşteri güncellendi!")
+        } catch (error: any) {
+            console.error('Update error:', error)
+            alert(`❌ Hata: ${error.message}`)
         }
     }
 
@@ -111,17 +131,23 @@ export function ClientList() {
                             <motion.div key={client.id} layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.2 }}>
                                 <Card className="overflow-hidden border-none shadow-md bg-white/80 dark:bg-black/40 backdrop-blur-md">
                                     <CardHeader className="p-4 pb-2 flex flex-row items-start justify-between space-y-0">
-                                        <div>
+                                        <div className="flex-1">
                                             <h3 className="font-semibold text-lg">{client.full_name}</h3>
                                             <Badge variant="default" className="mt-1">{getRoleLabel(client.role)}</Badge>
                                         </div>
-                                        <Button variant="ghost" size="icon" className="text-green-600 hover:text-green-700 hover:bg-green-50" onClick={() => window.open(`tel:${client.phone}`)}>
-                                            <Phone className="h-5 w-5" />
-                                        </Button>
+                                        <div className="flex gap-2">
+                                            <Button variant="ghost" size="icon" onClick={() => setEditingClient(client)}>
+                                                <Pencil className="h-4 w-4" />
+                                            </Button>
+                                            <Button variant="ghost" size="icon" className="text-green-600 hover:text-green-700 hover:bg-green-50" onClick={() => window.open(`tel:${client.phone}`)}>
+                                                <Phone className="h-5 w-5" />
+                                            </Button>
+                                        </div>
                                     </CardHeader>
                                     <CardContent className="p-4 pt-2 space-y-3">
                                         {client.current_job && <div className="flex items-center text-sm text-muted-foreground"><Briefcase className="mr-2 h-4 w-4 opacity-70" /><span>{client.current_job}</span></div>}
                                         {client.planned_activity && <div className="flex items-center text-sm font-medium text-primary"><Factory className="mr-2 h-4 w-4" /><span>{client.planned_activity}</span></div>}
+                                        {(client as any).owned_property_info && <div className="flex items-center text-sm text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-2 py-1 rounded"><Building2 className="mr-2 h-4 w-4" /><span>{(client as any).owned_property_info}</span></div>}
                                         {client.notes && <p className="text-xs text-muted-foreground bg-muted/50 p-2 rounded-md mt-2">{client.notes}</p>}
                                     </CardContent>
                                 </Card>
@@ -130,6 +156,22 @@ export function ClientList() {
                     </AnimatePresence>
                 </div>
             )}
+
+            <Sheet open={!!editingClient} onOpenChange={(open) => !open && setEditingClient(null)}>
+                <SheetContent side="bottom" className="h-[90vh] rounded-t-3xl">
+                    <SheetHeader className="mb-4">
+                        <SheetTitle>Müşteriyi Düzenle</SheetTitle>
+                        <SheetDescription>Müşteri bilgilerini güncelleyin.</SheetDescription>
+                    </SheetHeader>
+                    {editingClient && (
+                        <AddClientForm
+                            initialData={editingClient}
+                            onSubmit={handleEditClient}
+                            onCancel={() => setEditingClient(null)}
+                        />
+                    )}
+                </SheetContent>
+            </Sheet>
         </div>
     )
 }
