@@ -1,4 +1,4 @@
-import { Home, Building2, PlusCircle, StickyNote, Calendar } from "lucide-react"
+import { Home, Building2, PlusCircle, StickyNote, Calendar, CheckSquare } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import { cn } from "@/lib/utils"
 
@@ -6,6 +6,7 @@ const navItems = [
     { label: "Müşteriler", icon: Home, path: "/" },
     { label: "Portföy", icon: Building2, path: "/properties" },
     { label: "Ekle", icon: PlusCircle, path: "/add" },
+    { label: "To-Do", icon: CheckSquare, path: "/todos" },
     { label: "Notlar", icon: StickyNote, path: "/notes" },
     { label: "Planlar", icon: Calendar, path: "/plans" },
 ]
@@ -25,14 +26,14 @@ export function BottomNav() {
                                 key={item.path}
                                 to={item.path}
                                 className={cn(
-                                    "flex flex-col items-center justify-center gap-1 px-3 py-2 text-xs transition-colors",
+                                    "flex flex-col items-center justify-center gap-0.5 px-2 py-2 text-[10px] transition-colors",
                                     isActive
                                         ? "text-primary font-semibold"
                                         : "text-muted-foreground hover:text-foreground"
                                 )}
                             >
-                                <Icon className={cn("h-5 w-5", isActive && "text-primary")} />
-                                <span>{item.label}</span>
+                                <Icon className={cn("h-4 w-4", isActive && "text-primary")} />
+                                <span className="leading-tight">{item.label}</span>
                             </Link>
                         )
                     })}
