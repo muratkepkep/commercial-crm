@@ -12,11 +12,9 @@ interface PropertyFormProps {
     initialData?: Partial<Property>
     onSubmit?: (data: Partial<Property>) => Promise<any>
     isLoading?: boolean
-    initialLocation?: { lat: number; lng: number } | null
-    onLocationChange?: (lat: number, lng: number) => void
 }
 
-export function PropertyForm({ initialData, onSubmit, isLoading, initialLocation, onLocationChange }: PropertyFormProps) {
+export function PropertyForm({ initialData, onSubmit, isLoading }: PropertyFormProps) {
     // Property categorization
     const [propertyCategory, setPropertyCategory] = React.useState<PropertyCategory>(initialData?.property_category || "fabrika")
     const [listingType, setListingType] = React.useState<ListingType>(initialData?.listing_type || initialData?.property_type as any || "satilik")
