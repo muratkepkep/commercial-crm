@@ -111,12 +111,22 @@ export function ClientList() {
             </div>
 
             <Tabs defaultValue="all" onValueChange={(v) => setFilter(v as any)} className="w-full">
-                <TabsList className="w-full grid grid-cols-5 p-1 bg-muted/50 backdrop-blur-sm">
-                    <TabsTrigger value="all" className="text-xs">TÜMÜ</TabsTrigger>
-                    <TabsTrigger value="alici" className="text-xs">ALICI</TabsTrigger>
-                    <TabsTrigger value="satici" className="text-xs">SATICI</TabsTrigger>
-                    <TabsTrigger value="kiraci" className="text-xs">KİRACI</TabsTrigger>
-                    <TabsTrigger value="ev_sahibi" className="text-xs">EV SAHİBİ</TabsTrigger>
+                <TabsList className="w-full grid grid-cols-5 p-1.5 bg-gradient-to-r from-primary/10 via-purple-500/10 to-blue-500/10 backdrop-blur-sm rounded-xl border border-primary/20 shadow-lg">
+                    <TabsTrigger value="all" className="text-xs font-semibold data-[state=active]:bg-white/90 data-[state=active]:text-primary data-[state=active]:shadow-md rounded-lg transition-all">
+                        <span className="mr-1">📊</span>TÜMÜ
+                    </TabsTrigger>
+                    <TabsTrigger value="alici" className="text-xs font-semibold data-[state=active]:bg-green-50 data-[state=active]:text-green-700 data-[state=active]:shadow-md rounded-lg transition-all">
+                        <span className="mr-1">💰</span>ALICI
+                    </TabsTrigger>
+                    <TabsTrigger value="satici" className="text-xs font-semibold data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:shadow-md rounded-lg transition-all">
+                        <span className="mr-1">🏷️</span>SATICI
+                    </TabsTrigger>
+                    <TabsTrigger value="kiraci" className="text-xs font-semibold data-[state=active]:bg-purple-50 data-[state=active]:text-purple-700 data-[state=active]:shadow-md rounded-lg transition-all">
+                        <span className="mr-1">🔑</span>KİRACI
+                    </TabsTrigger>
+                    <TabsTrigger value="ev_sahibi" className="text-[10px] font-semibold data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700 data-[state=active]:shadow-md rounded-lg transition-all leading-tight">
+                        <span className="mr-0.5">🏢</span>MÜLK SAHİBİ
+                    </TabsTrigger>
                 </TabsList>
             </Tabs>
 
