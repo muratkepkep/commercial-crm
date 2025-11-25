@@ -147,6 +147,25 @@ export function ClientList() {
                                     <CardContent className="p-4 pt-2 space-y-3">
                                         {client.current_job && <div className="flex items-center text-sm text-muted-foreground"><Briefcase className="mr-2 h-4 w-4 opacity-70" /><span>{client.current_job}</span></div>}
                                         {client.planned_activity && <div className="flex items-center text-sm font-medium text-primary"><Factory className="mr-2 h-4 w-4" /><span>{client.planned_activity}</span></div>}
+                                        {(client as any).client_intent && (
+                                            <div className="flex items-center text-sm text-blue-700 dark:text-blue-400">
+                                                <span className="mr-2">🎯</span>
+                                                <span>
+                                                    {(client as any).client_intent === 'almak_istiyor' ? 'Almak İstiyor' :
+                                                        (client as any).client_intent === 'satmak_istiyor' ? 'Satmak İstiyor' :
+                                                            (client as any).client_intent === 'kiralamak_istiyor' ? 'Kiralamak İstiyor' :
+                                                                (client as any).client_intent === 'kiraya_vermek_istiyor' ? 'Kiraya Vermek İstiyor' : ''}
+                                                </span>
+                                            </div>
+                                        )}
+                                        {(client as any).search_type && (
+                                            <div className="flex items-center text-sm text-purple-700 dark:text-purple-400">
+                                                <span className="mr-2">🔍</span>
+                                                <span>
+                                                    {(client as any).search_type === 'satilik_ariyor' ? 'Satılık Arıyor' : 'Kiralık Arıyor'}
+                                                </span>
+                                            </div>
+                                        )}
                                         {(client as any).owned_property_info && String((client as any).owned_property_info).trim() && <div className="flex items-center text-sm text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-2 py-1 rounded"><Building2 className="mr-2 h-4 w-4" /><span>{(client as any).owned_property_info}</span></div>}
                                         {client.notes && <p className="text-xs text-muted-foreground bg-muted/50 p-2 rounded-md mt-2">{client.notes}</p>}
                                     </CardContent>
