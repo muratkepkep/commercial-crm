@@ -147,7 +147,7 @@ export function ClientList() {
                                     <CardContent className="p-4 pt-2 space-y-3">
                                         {client.current_job && <div className="flex items-center text-sm text-muted-foreground"><Briefcase className="mr-2 h-4 w-4 opacity-70" /><span>{client.current_job}</span></div>}
                                         {client.planned_activity && <div className="flex items-center text-sm font-medium text-primary"><Factory className="mr-2 h-4 w-4" /><span>{client.planned_activity}</span></div>}
-                                        {(client as any).owned_property_info && <div className="flex items-center text-sm text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-2 py-1 rounded"><Building2 className="mr-2 h-4 w-4" /><span>{(client as any).owned_property_info}</span></div>}
+                                        {(client as any).owned_property_info && String((client as any).owned_property_info).trim() && <div className="flex items-center text-sm text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-2 py-1 rounded"><Building2 className="mr-2 h-4 w-4" /><span>{(client as any).owned_property_info}</span></div>}
                                         {client.notes && <p className="text-xs text-muted-foreground bg-muted/50 p-2 rounded-md mt-2">{client.notes}</p>}
                                     </CardContent>
                                 </Card>

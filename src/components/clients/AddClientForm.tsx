@@ -30,6 +30,11 @@ export function AddClientForm({ initialData, onSubmit, onCancel }: AddClientForm
             client_intent: clientIntent || undefined
         }
 
+        // Remove owned_property_info if empty or if not ev_sahibi
+        if (!cleanData.owned_property_info || role !== 'ev_sahibi') {
+            delete cleanData.owned_property_info
+        }
+
         const numericFields = ['budget_min', 'budget_max']
         numericFields.forEach(field => {
             if (cleanData[field] === "") {
