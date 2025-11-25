@@ -1,5 +1,5 @@
 import * as React from "react"
-import type { ClientRole, SearchType } from "@/types"
+import type { ClientRole, ClientIntent } from "@/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -13,7 +13,8 @@ interface AddClientFormProps {
 
 export function AddClientForm({ onSubmit, onCancel }: AddClientFormProps) {
     const [role, setRole] = React.useState<ClientRole>("alici")
-    const [searchType, setSearchType] = React.useState<SearchType>("satilik_ariyor")
+    const [searchType, setSearchType] = React.useState<string>("satilik_ariyor")
+    const [clientIntent, setClientIntent] = React.useState<ClientIntent | "">("")
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
@@ -21,7 +22,12 @@ export function AddClientForm({ onSubmit, onCancel }: AddClientFormProps) {
         const rawData = Object.fromEntries(formData)
 
         // Sayısal alanları temizle (boş string "" yerine null gönderilmeli)
-        const cleanData: any = { ...rawData, role, search_type: searchType }
+        const cleanData: any = {
+            ...rawData,
+            role,
+            search_type: searchType || undefined,
+            client_intent: clientIntent || undefined
+        }
 
         const numericFields = ['budget_min', 'budget_max']
         numericFields.forEach(field => {
@@ -39,7 +45,7 @@ export function AddClientForm({ onSubmit, onCancel }: AddClientFormProps) {
         <form onSubmit={handleSubmit} className="flex flex-col h-full">
             <div className="flex-1 space-y-6 py-4 pb-24">
                 <div className="space-y-2">
-                    <Label htmlFor="full_name">Ad Soyad</Label>
+                    <Label htmlFor="full_name">Ad Soyad *</Label>
                     <Input id="full_name" name="full_name" required placeholder="Ahmet Yılmaz" />
                 </div>
 
@@ -49,28 +55,45 @@ export function AddClientForm({ onSubmit, onCancel }: AddClientFormProps) {
                         <Input id="phone" name="phone" type="tel" placeholder="0532 555 55 55" />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="role">Rol</Label>
+                        <Label htmlFor="role">Rol *</Label>
                         <Select value={role} onValueChange={(v) => setRole(v as ClientRole)}>
                             <SelectTrigger><SelectValue placeholder="Rol Seçiniz" /></SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="alici">Alıcı</SelectItem>
                                 <SelectItem value="satici">Satıcı</SelectItem>
                                 <SelectItem value="kiraci">Kiracı</SelectItem>
+                                <SelectItem value="ev_sahibi">Ev Sahibi / Fabrika Sahibi</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
                 </div>
 
                 <div className="space-y-2">
-                    <Label>Arayış Tipi</Label>
-                    <Select value={searchType} onValueChange={(v) => setSearchType(v as SearchType)}>
-                        <SelectTrigger><SelectValue placeholder="Ne Arıyor?" /></SelectTrigger>
+                    <Label>Ne Yapmak İstiyor?</Label>
+                    <Select value={clientIntent} onValueChange={(v) => setClientIntent(v as ClientIntent)}>
+                        <SelectTrigger><SelectValue placeholder="Seçiniz (İsteğe bağlı)" /></SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="satilik_ariyor">Satılık Arıyor</SelectItem>
-                            <SelectItem value="kiralik_ariyor">Kiralık Arıyor</SelectItem>
+                            <SelectItem value="">-- Seçiniz --</SelectItem>
+                            <SelectItem value="almak_istiyor">Almak İstiyor (Satın Almak)</SelectItem>
+                            <SelectItem value="satmak_istiyor">Satmak İstiyor</SelectItem>
+                            <SelectItem value="kiralamak_istiyor">Kiralamak İstiyor (Kiracı Olarak)</SelectItem>
+                            <SelectItem value="kiraya_vermek_istiyor">Kiraya Vermek İstiyor</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
+
+                {(role === "alici" || role === "kiraci") && (
+                    <div className="space-y-2">
+                        <Label>Arayış Tipi</Label>
+                        <Select value={searchType} onValueChange={setSearchType}>
+                            <SelectTrigger><SelectValue placeholder="Ne Arıyor?" /></SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="satilik_ariyor">Satılık Arıyor</SelectItem>
+                                <SelectItem value="kiralik_ariyor">Kiralık Arıyor</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                )}
 
                 <div className="space-y-2">
                     <Label htmlFor="current_job">Mevcut İşi / Mesleği</Label>
@@ -87,16 +110,18 @@ export function AddClientForm({ onSubmit, onCancel }: AddClientFormProps) {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="budget_min">Min Bütçe</Label>
-                        <Input id="budget_min" name="budget_min" type="number" placeholder="1.000.000" />
+                {(role === "alici" || role === "kiraci") && (
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="budget_min">Min Bütçe</Label>
+                            <Input id="budget_min" name="budget_min" type="number" placeholder="1.000.000" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="budget_max">Max Bütçe</Label>
+                            <Input id="budget_max" name="budget_max" type="number" placeholder="5.000.000" />
+                        </div>
                     </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="budget_max">Max Bütçe</Label>
-                        <Input id="budget_max" name="budget_max" type="number" placeholder="5.000.000" />
-                    </div>
-                </div>
+                )}
 
                 <div className="space-y-2">
                     <Label htmlFor="notes">Notlar</Label>

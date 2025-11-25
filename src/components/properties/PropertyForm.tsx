@@ -4,17 +4,33 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { IndustrialCalculator } from "./IndustrialCalculator"
-import type { Property } from "@/types"
+import type { Property, PropertyCategory, ListingType, Client } from "@/types"
 import { X } from "lucide-react"
+import { getClientsByRole } from "@/lib/db"
 
 interface PropertyFormProps {
     initialData?: Partial<Property>
     onSubmit?: (data: Partial<Property>) => Promise<any>
     isLoading?: boolean
+    initialLocation?: { lat: number; lng: number } | null
+    onLocationChange?: (lat: number, lng: number) => void
 }
 
-export function PropertyForm({ initialData, onSubmit, isLoading }: PropertyFormProps) {
-    const [propertyType, setPropertyType] = React.useState<"satilik" | "kiralik">(initialData?.property_type as any || "satilik")
+export function PropertyForm({ initialData, onSubmit, isLoading, initialLocation, onLocationChange }: PropertyFormProps) {
+    // Property categorization
+    const [propertyCategory, setPropertyCategory] = React.useState<PropertyCategory>(initialData?.property_category || "fabrika")
+    const [listingType, setListingType] = React.useState<ListingType>(initialData?.listing_type || initialData?.property_type as any || "satilik")
+
+    // Location fields
+    const [address, setAddress] = React.useState(initialData?.address || "")
+    const [city, setCity] = React.useState(initialData?.city || "")
+    const [district, setDistrict] = React.useState(initialData?.district || "")
+
+    // Property owner for rentals
+    const [propertyOwnerId, setPropertyOwnerId] = React.useState(initialData?.property_owner_id || "")
+    const [propertyOwners, setPropertyOwners] = React.useState<Client[]>([])
+
+    // Existing fields
     const [closedArea, setClosedArea] = React.useState(initialData?.closed_area_m2?.toString() || "")
     const [openArea, setOpenArea] = React.useState(initialData?.open_area_m2?.toString() || "")
     const [unitPrice, setUnitPrice] = React.useState("")
@@ -30,12 +46,21 @@ export function PropertyForm({ initialData, onSubmit, isLoading }: PropertyFormP
     const [existingImages, setExistingImages] = React.useState<string[]>(initialData?.image_urls || [])
     const fileInputRef = React.useRef<HTMLInputElement>(null)
 
+    // Load property owners (clients with role 'ev_sahibi')
+    React.useEffect(() => {
+        const loadOwners = async () => {
+            const { data } = await getClientsByRole('ev_sahibi')
+            setPropertyOwners(data)
+        }
+        loadOwners()
+    }, [])
+
     const handleAreaCalculated = (area: number) => {
         setClosedArea(area.toString())
-        calculatePricing(area.toString(), unitPrice, totalPrice, propertyType)
+        calculatePricing(area.toString(), unitPrice, totalPrice, listingType)
     }
 
-    const calculatePricing = (area: string, unit: string, total: string, type: "satilik" | "kiralik") => {
+    const calculatePricing = (area: string, unit: string, total: string, type: ListingType) => {
         const areaNum = parseFloat(area)
         if (!areaNum) return
 
@@ -48,25 +73,25 @@ export function PropertyForm({ initialData, onSubmit, isLoading }: PropertyFormP
 
     const handleUnitPriceChange = (val: string) => {
         setUnitPrice(val)
-        if (propertyType === "kiralik" && closedArea && val) {
+        if (listingType === "kiralik" && closedArea && val) {
             setTotalPrice((parseFloat(closedArea) * parseFloat(val)).toString())
         }
     }
 
     const handleTotalPriceChange = (val: string) => {
         setTotalPrice(val)
-        if (propertyType === "satilik" && closedArea && val) {
+        if (listingType === "satilik" && closedArea && val) {
             setUnitPrice((parseFloat(val) / parseFloat(closedArea)).toFixed(2))
         }
     }
 
     const handleClosedAreaChange = (val: string) => {
         setClosedArea(val)
-        calculatePricing(val, unitPrice, totalPrice, propertyType)
+        calculatePricing(val, unitPrice, totalPrice, listingType)
     }
 
-    const handlePropertyTypeChange = (type: "satilik" | "kiralik") => {
-        setPropertyType(type)
+    const handleListingTypeChange = (type: ListingType) => {
+        setListingType(type)
         calculatePricing(closedArea, unitPrice, totalPrice, type)
     }
 
@@ -97,15 +122,21 @@ export function PropertyForm({ initialData, onSubmit, isLoading }: PropertyFormP
             const propertyData: Partial<Property> = {
                 title,
                 description: description || undefined,
-                property_type: propertyType,
+                property_category: propertyCategory,
+                listing_type: listingType,
+                property_type: listingType, // Keep for backwards compatibility
                 price: totalPrice ? parseFloat(totalPrice) : undefined,
                 currency,
+                address: address || undefined,
+                city: city || undefined,
+                district: district || undefined,
                 closed_area_m2: closedArea ? parseFloat(closedArea) : undefined,
                 open_area_m2: openArea ? parseFloat(openArea) : undefined,
                 height_m: height ? parseFloat(height) : undefined,
                 power_kw: power ? parseFloat(power) : undefined,
                 ada: ada || undefined,
                 parsel: parsel || undefined,
+                property_owner_id: (listingType === "kiralik" && propertyOwnerId) ? propertyOwnerId : undefined,
             }
 
             // Attach image files (handled by parent component)
@@ -126,6 +157,12 @@ export function PropertyForm({ initialData, onSubmit, isLoading }: PropertyFormP
     const resetForm = () => {
         setTitle("")
         setDescription("")
+        setPropertyCategory("fabrika")
+        setListingType("satilik")
+        setAddress("")
+        setCity("")
+        setDistrict("")
+        setPropertyOwnerId("")
         setClosedArea("")
         setOpenArea("")
         setUnitPrice("")
@@ -140,19 +177,28 @@ export function PropertyForm({ initialData, onSubmit, isLoading }: PropertyFormP
     }
 
     const handleShare = () => {
-        const typeLabel = propertyType === "satilik" ? "SATILIK" : "KİRALIK"
-        const priceLabel = propertyType === "satilik" ? "Fiyat" : "Aylık Kira"
+        const categoryLabels = {
+            daire: "Daire",
+            fabrika: "Fabrika",
+            arsa: "Arsa",
+            ofis: "Ofis",
+            depo: "Depo",
+            arazi: "Arazi"
+        }
+        const typeLabel = listingType === "satilik" ? "SATILIK" : "KİRALIK"
+        const priceLabel = listingType === "satilik" ? "Fiyat" : "Aylık Kira"
 
-        const text = `🏭 *YENİ PORTFÖY: ${title}* (${typeLabel})
+        const text = `🏭 *YENİ PORTFÖY: ${title}* (${categoryLabels[propertyCategory]} - ${typeLabel})
     
+${city && district ? `📍 *Konum:* ${district}, ${city}` : ''}
 📐 *Kapalı Alan:* ${closedArea} m²
-🌳 *Açık Alan:* ${openArea} m²
-💰 *${priceLabel}:* ${parseFloat(totalPrice).toLocaleString('tr-TR')} ${currency}
-💵 *Birim Fiyat:* ${unitPrice} ${currency}/m²
+${openArea ? `🌳 *Açık Alan:* ${openArea} m²` : ''}
+💰 *${priceLabel}:* ${totalPrice ? parseFloat(totalPrice).toLocaleString('tr-TR') : ''} ${currency}
+${unitPrice ? `💵 *Birim Fiyat:* ${unitPrice} ${currency}/m²` : ''}
     
-🏗 *Yükseklik:* ${height} m
-⚡ *Enerji:* ${power} kW
-📍 *Ada-Parsel:* ${ada}/${parsel}
+${height ? `🏗 *Yükseklik:* ${height} m` : ''}
+${power ? `⚡ *Enerji:* ${power} kW` : ''}
+${ada && parsel ? `📍 *Ada-Parsel:* ${ada}/${parsel}` : ''}
     
 Detaylar için arayınız.`.trim()
 
@@ -180,18 +226,67 @@ Detaylar için arayınız.`.trim()
                     <Input id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Ek notlar..." />
                 </div>
 
-                <div className="space-y-2">
-                    <Label>Mülk Tipi *</Label>
-                    <Select value={propertyType} onValueChange={handlePropertyTypeChange}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="satilik">Satılık</SelectItem>
-                            <SelectItem value="kiralik">Kiralık</SelectItem>
-                        </SelectContent>
-                    </Select>
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label>Mülk Kategorisi *</Label>
+                        <Select value={propertyCategory} onValueChange={(v) => setPropertyCategory(v as PropertyCategory)}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="daire">Daire</SelectItem>
+                                <SelectItem value="fabrika">Fabrika</SelectItem>
+                                <SelectItem value="arsa">Arsa</SelectItem>
+                                <SelectItem value="ofis">Ofis</SelectItem>
+                                <SelectItem value="depo">Depo</SelectItem>
+                                <SelectItem value="arazi">Arazi</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label>İlan Tipi *</Label>
+                        <Select value={listingType} onValueChange={handleListingTypeChange}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="satilik">Satılık</SelectItem>
+                                <SelectItem value="kiralik">Kiralık</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
 
-                {propertyType === "kiralik" ? (
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="city">Şehir</Label>
+                        <Input id="city" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Örn: Kocaeli" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="district">İlçe</Label>
+                        <Input id="district" value={district} onChange={(e) => setDistrict(e.target.value)} placeholder="Örn: Gebze" />
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="address">Adres</Label>
+                    <Input id="address" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Mahalle, sokak, bina no..." />
+                </div>
+
+                {listingType === "kiralik" && propertyOwners.length > 0 && (
+                    <div className="space-y-2">
+                        <Label>Mülk Sahibi</Label>
+                        <Select value={propertyOwnerId} onValueChange={setPropertyOwnerId}>
+                            <SelectTrigger><SelectValue placeholder="Seçiniz (İsteğe bağlı)" /></SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="">-- Seçiniz --</SelectItem>
+                                {propertyOwners.map(owner => (
+                                    <SelectItem key={owner.id} value={owner.id}>
+                                        {owner.full_name} {owner.phone && `(${owner.phone})`}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                )}
+
+                {listingType === "kiralik" ? (
                     <>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">

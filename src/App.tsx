@@ -4,6 +4,8 @@ import ClientsPage from "@/pages/ClientsPage"
 import PropertiesPage from "@/pages/PropertiesPage"
 import AddPage from "@/pages/AddPage"
 import TodosPage from "@/pages/TodosPage"
+import NotesPage from "@/pages/NotesPage"
+import PlansPage from "@/pages/PlansPage"
 import ProfilePage from "@/pages/ProfilePage"
 import LoginPage from "@/pages/LoginPage"
 import { AuthProvider } from "@/contexts/AuthContext"
@@ -22,6 +24,8 @@ function App() {
               <Route path="/properties" element={<ProtectedRoute><PropertiesPage /></ProtectedRoute>} />
               <Route path="/add" element={<ProtectedRoute><AddPage /></ProtectedRoute>} />
               <Route path="/todos" element={<ProtectedRoute><TodosPage /></ProtectedRoute>} />
+              <Route path="/notes" element={<ProtectedRoute><NotesPage /></ProtectedRoute>} />
+              <Route path="/plans" element={<ProtectedRoute><PlansPage /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
 
               {/* Redirect unknown routes to properties if logged in, or login if not */}
