@@ -189,39 +189,42 @@ Detaylar için arayınız.
                                                 </div>
                                             </div>
                                         </CardHeader>
-                                        <CardContent className="pb-3">
-                                            <div className="grid grid-cols-2 gap-2 text-sm">
+                                        <CardContent className="pb-3 pt-0">
+                                            {property.price && (
+                                                <div className="mb-3 pb-3 border-b">
+                                                    <div className="flex items-baseline gap-1">
+                                                        <DollarSign className="h-5 w-5 text-primary" />
+                                                        <span className="text-2xl font-bold text-primary">
+                                                            {property.price.toLocaleString('tr-TR')}
+                                                        </span>
+                                                        <span className="text-base font-semibold text-primary/70">{property.currency}</span>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            <div className="grid grid-cols-2 gap-2 text-xs">
                                                 {property.closed_area_m2 && (
-                                                    <div className="flex items-center gap-2">
-                                                        <Building2 className="h-4 w-4 text-muted-foreground" />
+                                                    <div className="flex items-center gap-1.5">
+                                                        <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
                                                         <span className="font-medium">Kapalı: {property.closed_area_m2} m²</span>
                                                     </div>
                                                 )}
                                                 {property.open_area_m2 && (
-                                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                                    <div className="flex items-center gap-1.5 text-muted-foreground">
                                                         <span>🌳 Açık: {property.open_area_m2} m²</span>
                                                     </div>
                                                 )}
-                                                {property.price && (
-                                                    <div className="flex items-center gap-2 col-span-2">
-                                                        <DollarSign className="h-4 w-4 text-muted-foreground" />
-                                                        <span className="font-semibold text-primary">
-                                                            {property.price.toLocaleString('tr-TR')} {property.currency}
-                                                        </span>
-                                                    </div>
-                                                )}
                                                 {property.height_m && (
-                                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                                    <div className="flex items-center gap-1.5 text-muted-foreground">
                                                         <span>🏗 Yükseklik: {property.height_m} m</span>
                                                     </div>
                                                 )}
                                                 {property.power_kw && (
-                                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                                    <div className="flex items-center gap-1.5 text-muted-foreground">
                                                         <span>⚡ {property.power_kw} kW</span>
                                                     </div>
                                                 )}
                                                 {(property.ada && property.parsel) && (
-                                                    <div className="flex items-center gap-2 text-xs text-muted-foreground col-span-2">
+                                                    <div className="flex items-center gap-1.5 text-muted-foreground col-span-2">
                                                         <span>📍 Ada: {property.ada} / Parsel: {property.parsel}</span>
                                                     </div>
                                                 )}
