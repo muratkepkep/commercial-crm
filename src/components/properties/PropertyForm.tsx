@@ -8,7 +8,7 @@ import { IndustrialCalculator } from "./IndustrialCalculator"
 import type { Property, PropertyCategory, ListingType, Client } from "@/types"
 import { X } from "lucide-react"
 import { getClientsByRole } from "@/lib/db"
-import { MapPicker } from "@/components/common/MapPicker"
+import { MapPicker } from "./MapPicker"
 
 interface PropertyFormProps {
     initialData?: Partial<Property>
