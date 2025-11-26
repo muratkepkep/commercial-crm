@@ -8,8 +8,10 @@ import L from 'leaflet'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 
-import { getProperty, getPropertyImages, getPropertyImageUrl, deleteProperty, deletePropertyImage } from "@/lib/db"
+import { PropertyForm } from "@/components/properties/PropertyForm"
+import { getProperty, getPropertyImages, getPropertyImageUrl, deleteProperty, deletePropertyImage, updateProperty, uploadPropertyImages } from "@/lib/db"
 import { useAuth } from "@/contexts/AuthContext"
 import { canEdit, canDelete } from "@/lib/auth"
 import type { Property } from "@/types"
@@ -37,6 +39,7 @@ export default function PropertyDetailPage() {
     const [images, setImages] = React.useState<PropertyImage[]>([])
     const [loading, setLoading] = React.useState(true)
     const [currentImageIndex, setCurrentImageIndex] = React.useState(0)
+    const [isEditing, setIsEditing] = React.useState(false)
 
     React.useEffect(() => {
         const loadData = async () => {
@@ -295,12 +298,7 @@ Detaylar için: ${window.location.href}
                 {/* Actions */}
                 <div className="pt-4 flex gap-3">
                     {canEdit(user?.role || 'viewer') && (
-                        <Button className="flex-1" variant="outline" onClick={() => {
-                            // Edit logic here - maybe open sheet with initial data
-                            // For now, we might need to pass state back or handle it differently
-                            // Since we are on a separate page, we might need a dedicated edit page or modal
-                            alert("Düzenleme özelliği bu sayfada henüz aktif değil. Listeden düzenleyebilirsiniz.")
-                        }}>
+                        <Button className="flex-1" variant="outline" onClick={() => setIsEditing(true)}>
                             <Pencil className="mr-2 h-4 w-4" />
                             Düzenle
                         </Button>
@@ -313,6 +311,55 @@ Detaylar için: ${window.location.href}
                     )}
                 </div>
             </div>
+
+            {/* Edit Sheet */}
+            <Sheet open={isEditing} onOpenChange={(open) => !open && setIsEditing(false)}>
+                <SheetContent side="bottom" className="h-[90vh] rounded-t-3xl overflow-y-auto">
+                    <SheetHeader>
+                        <SheetTitle>Mülk Düzenle</SheetTitle>
+                    </SheetHeader>
+                    {property && (
+                        <PropertyForm
+                            initialData={property}
+                            onSubmit={async (updatedData) => {
+                                try {
+                                    // Extract image files
+                                    const imageFiles = (updatedData as any)._imageFiles as File[] | undefined
+                                    delete (updatedData as any)._imageFiles
+
+                                    const { error } = await updateProperty(property.id, updatedData)
+                                    if (error) {
+                                        alert(`❌ Hata: ${error.message || JSON.stringify(error)}`)
+                                        return
+                                    }
+
+                                    // Upload new images if any
+                                    if (imageFiles && imageFiles.length > 0) {
+                                        const { error: uploadError } = await uploadPropertyImages(property.id, imageFiles)
+                                        if (uploadError) {
+                                            alert("⚠️ Mülk güncellendi ama görseller yüklenemedi.")
+                                        }
+                                    }
+
+                                    alert('✅ Mülk başarıyla güncellendi!')
+                                    setIsEditing(false)
+
+                                    // Reload property data
+                                    const { id } = property
+                                    const [propRes, imgRes] = await Promise.all([
+                                        getProperty(id),
+                                        getPropertyImages(id)
+                                    ])
+                                    if (propRes.data) setProperty(propRes.data)
+                                    if (imgRes.data) setImages(imgRes.data)
+                                } catch (error: any) {
+                                    alert(`❌ Hata: ${error.message || 'Beklenmeyen hata'}`)
+                                }
+                            }}
+                        />
+                    )}
+                </SheetContent>
+            </Sheet>
         </div>
     )
 }

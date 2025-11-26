@@ -152,8 +152,8 @@ export function ClientList() {
                     <TabsTrigger value="kiraci" className="text-xs font-semibold data-[state=active]:bg-purple-50 data-[state=active]:text-purple-700 data-[state=active]:shadow-md rounded-lg transition-all">
                         <span className="mr-1">🔑</span>KİRACI
                     </TabsTrigger>
-                    <TabsTrigger value="ev_sahibi" className="text-[10px] font-semibold data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700 data-[state=active]:shadow-md rounded-lg transition-all leading-tight">
-                        <span className="mr-0.5">🏢</span>MÜLK SAHİBİ
+                    <TabsTrigger value="ev_sahibi" className="text-xs font-semibold data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700 data-[state=active]:shadow-md rounded-lg transition-all">
+                        <span className="mr-1">🏢</span>MÜLK SAHİBİ
                     </TabsTrigger>
                 </TabsList>
             </Tabs>
