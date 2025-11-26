@@ -20,12 +20,12 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 interface MapPickerProps {
     onLocationSelect: (lat: number, lng: number) => void;
-    initialLat?: number;
-    initialLng?: number;
+    lat?: number;
+    lng?: number;
 }
 
-function LocationMarker({ onLocationSelect }: { onLocationSelect: (lat: number, lng: number) => void }) {
-    const [position, setPosition] = useState<L.LatLng | null>(null)
+function LocationMarker({ onLocationSelect, initialPosition }: { onLocationSelect: (lat: number, lng: number) => void; initialPosition?: L.LatLng | null }) {
+    const [position, setPosition] = useState<L.LatLng | null>(initialPosition || null)
 
     useMapEvents({
         click(e) {
@@ -80,19 +80,20 @@ function GeolocationButton({ onLocationFound }: { onLocationFound: (lat: number,
     )
 }
 
-export function MapPicker({ onLocationSelect, initialLat = 41.0082, initialLng = 28.9784 }: MapPickerProps) {
-    const [currentPosition, setCurrentPosition] = useState<[number, number] | null>(null)
+export function MapPicker({ onLocationSelect, lat, lng }: MapPickerProps) {
+    // Create initial position if lat/lng are provided
+    const initialPosition = (lat != null && lng != null) ? L.latLng(lat, lng) : null
+    const centerPosition: [number, number] = (lat != null && lng != null) ? [lat, lng] : [41.0082, 28.9784]
 
-    const handleLocationFound = (lat: number, lng: number) => {
-        setCurrentPosition([lat, lng])
-        onLocationSelect(lat, lng)
+    const handleLocationFound = (newLat: number, newLng: number) => {
+        onLocationSelect(newLat, newLng)
     }
 
     return (
         <div className="h-[300px] w-full rounded-md overflow-hidden border z-0 relative">
             <MapContainer
-                center={[initialLat, initialLng]}
-                zoom={13}
+                center={centerPosition}
+                zoom={lat != null && lng != null ? 15 : 13}
                 scrollWheelZoom={false}
                 style={{ height: '100%', width: '100%' }}
             >
@@ -100,8 +101,7 @@ export function MapPicker({ onLocationSelect, initialLat = 41.0082, initialLng =
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                <LocationMarker onLocationSelect={onLocationSelect} />
-                {currentPosition && <Marker position={currentPosition} />}
+                <LocationMarker onLocationSelect={onLocationSelect} initialPosition={initialPosition} />
                 <GeolocationButton onLocationFound={handleLocationFound} />
             </MapContainer>
         </div>

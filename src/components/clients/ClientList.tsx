@@ -1,6 +1,6 @@
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Plus, Phone, Briefcase, Factory, Pencil, Building2 } from "lucide-react"
+import { Plus, Phone, Briefcase, Factory, Pencil, Building2, Trash2 } from "lucide-react"
 import type { Client, ClientRole } from "@/types"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { AddClientForm } from "./AddClientForm"
-import { getClients, createClient, updateClient } from "@/lib/db"
+import { getClients, createClient, updateClient, deleteClient } from "@/lib/db"
+import { ExportButton } from "@/components/common/ExportButton"
 
 export function ClientList() {
     const [clients, setClients] = React.useState<Client[]>([])
@@ -76,6 +77,26 @@ export function ClientList() {
         }
     }
 
+    const handleDeleteClient = async (client: Client) => {
+        if (!confirm(`"${client.full_name}" müşterisini silmek istediğinizden emin misiniz?`)) {
+            return
+        }
+
+        try {
+            const result = await deleteClient(client.id)
+            if (result.error) {
+                alert(`❌ Hata: ${result.error.message || JSON.stringify(result.error)}`)
+                return
+            }
+
+            await loadClients()
+            alert("✅ Müşteri silindi!")
+        } catch (error: any) {
+            console.error('Delete error:', error)
+            alert(`❌ Hata: ${error.message}`)
+        }
+    }
+
     const getRoleLabel = (role: ClientRole) => {
         if (role === "alici") return "Alıcı"
         if (role === "satici") return "Satıcı"
@@ -96,18 +117,25 @@ export function ClientList() {
         <div className="space-y-6 p-4 pb-20">
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-bold tracking-tight">Müşteri Defteri</h1>
-                <Sheet open={isAddOpen} onOpenChange={setIsAddOpen}>
-                    <SheetTrigger asChild>
-                        <Button size="icon" className="rounded-full h-12 w-12 shadow-lg"><Plus className="h-6 w-6" /></Button>
-                    </SheetTrigger>
-                    <SheetContent side="bottom" className="h-[90vh] rounded-t-3xl">
-                        <SheetHeader className="mb-4">
-                            <SheetTitle>Yeni Müşteri Ekle</SheetTitle>
-                            <SheetDescription>Müşteri bilgilerini ve taleplerini giriniz.</SheetDescription>
-                        </SheetHeader>
-                        <AddClientForm onSubmit={handleAddClient} onCancel={() => setIsAddOpen(false)} />
-                    </SheetContent>
-                </Sheet>
+                <div className="flex gap-2">
+                    <ExportButton
+                        data={clients}
+                        filename={`musteriler-${new Date().toISOString().split('T')[0]}`}
+                        entityName="Müşteriler"
+                    />
+                    <Sheet open={isAddOpen} onOpenChange={setIsAddOpen}>
+                        <SheetTrigger asChild>
+                            <Button size="icon" className="rounded-full h-12 w-12 shadow-lg"><Plus className="h-6 w-6" /></Button>
+                        </SheetTrigger>
+                        <SheetContent side="bottom" className="h-[90vh] rounded-t-3xl">
+                            <SheetHeader className="mb-4">
+                                <SheetTitle>Yeni Müşteri Ekle</SheetTitle>
+                                <SheetDescription>Müşteri bilgilerini ve taleplerini giriniz.</SheetDescription>
+                            </SheetHeader>
+                            <AddClientForm onSubmit={handleAddClient} onCancel={() => setIsAddOpen(false)} />
+                        </SheetContent>
+                    </Sheet>
+                </div>
             </div>
 
             <Tabs defaultValue="all" onValueChange={(v) => setFilter(v as any)} className="w-full">
@@ -148,6 +176,9 @@ export function ClientList() {
                                         <div className="flex gap-2">
                                             <Button variant="ghost" size="icon" onClick={() => setEditingClient(client)}>
                                                 <Pencil className="h-4 w-4" />
+                                            </Button>
+                                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDeleteClient(client)}>
+                                                <Trash2 className="h-4 w-4" />
                                             </Button>
                                             <Button variant="ghost" size="icon" className="text-green-600 hover:text-green-700 hover:bg-green-50" onClick={() => window.open(`tel:${client.phone}`)}>
                                                 <Phone className="h-5 w-5" />

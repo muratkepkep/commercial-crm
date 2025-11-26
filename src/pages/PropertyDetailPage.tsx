@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { ChevronLeft, MapPin, Building2, Share2, Pencil, Trash2, Calendar, Zap, ArrowUpFromLine, ChevronRight } from "lucide-react"
+import { ChevronLeft, MapPin, Building2, Share2, Pencil, Trash2, Calendar, Zap, ChevronRight } from "lucide-react"
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
@@ -198,13 +198,11 @@ Detaylar için: ${window.location.href}
                                 <Building2 className="h-4 w-4" />
                             </div>
                             <div>
-                                <ArrowUpFromLine className="h-4 w-4" />
-                            </div>
-                            <div>
                                 <p className="text-xs text-muted-foreground">Yükseklik</p>
-                                <p className="font-medium">{property.height_m} m</p>
+                                <p className="font-medium">{property.height_m || '-'} m</p>
                             </div>
                         </div>
+
 
 
                         {property.power_kw && (
@@ -261,7 +259,7 @@ Detaylar için: ${window.location.href}
                 <div className="space-y-2">
                     <h2 className="font-semibold text-lg">Konum</h2>
                     <div className="h-64 rounded-xl overflow-hidden border z-0 relative">
-                        {property.lat && property.lng ? (
+                        {(property.lat != null && property.lng != null) ? (
                             <MapContainer
                                 center={[property.lat, property.lng]}
                                 zoom={15}

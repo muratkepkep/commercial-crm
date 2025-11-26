@@ -1,16 +1,22 @@
 import * as React from "react"
 import { PropertyList } from "@/components/properties/PropertyList"
-import { getProperties, deleteProperty } from "@/lib/db"
+import { getProperties, deleteProperty, exportProperties } from "@/lib/db"
+import { ExportButton } from "@/components/common/ExportButton"
 import type { Property } from "@/types"
 
 export default function PropertiesPage() {
     const [properties, setProperties] = React.useState<Property[]>([])
     const [loading, setLoading] = React.useState(true)
+    const [exportData, setExportData] = React.useState<any[]>([])
 
     const loadProperties = async () => {
         try {
             const { data } = await getProperties()
             setProperties(data || [])
+
+            // Load export data with images
+            const exportResult = await exportProperties()
+            setExportData(exportResult.data || [])
         } catch (error) {
             console.error('Error loading properties:', error)
         } finally {
@@ -43,7 +49,14 @@ export default function PropertiesPage() {
 
     return (
         <div className="p-4">
-            <h2 className="text-2xl font-bold mb-4">Portföyler</h2>
+            <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold">Portföyler</h2>
+                <ExportButton
+                    data={exportData}
+                    filename={`portfolyolar-${new Date().toISOString().split('T')[0]}`}
+                    entityName="Portföyler"
+                />
+            </div>
             <PropertyList
                 properties={properties}
                 onDelete={handleDelete}

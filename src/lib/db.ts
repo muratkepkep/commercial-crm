@@ -609,10 +609,36 @@ export const completePlan = async (id: string): Promise<{ data: Plan | null; err
 
 // ==================== EXPORT / IMPORT ====================
 
+// Export properties with full image URLs
+export const exportProperties = async (): Promise<{ data: any[]; error: any }> => {
+    try {
+        const { data: properties, error } = await getProperties()
+        if (error) throw error
+
+        // Fetch images for each property and add full URLs
+        const propertiesWithImages = await Promise.all(
+            properties.map(async (property) => {
+                const { data: images } = await getPropertyImages(property.id)
+                const imageUrls = images.map(img => getPropertyImageUrl(img.storage_path))
+                return {
+                    ...property,
+                    image_full_urls: imageUrls
+                }
+            })
+        )
+
+        return { data: propertiesWithImages, error: null }
+    } catch (error) {
+        console.error('Export properties error:', error)
+        return { data: [], error }
+    }
+}
+
+// Export all data with enhanced property information
 export const exportAllData = async (): Promise<string> => {
     try {
         const [properties, clients, todos, notes, plans] = await Promise.all([
-            getProperties(),
+            exportProperties(), // Use enhanced export
             getClients(),
             getTodos(),
             getNotes(),
@@ -626,7 +652,7 @@ export const exportAllData = async (): Promise<string> => {
             notes: notes.data,
             plans: plans.data,
             exported_at: new Date().toISOString(),
-            version: '3.0-enhanced'
+            version: '4.0-complete' // Updated version
         }
 
         return JSON.stringify(exportData, null, 2)
