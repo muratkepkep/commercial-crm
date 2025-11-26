@@ -1,7 +1,7 @@
 {
-    "name": "Sanayi Port CRM",
-    "short_name": "Sanayi Port",
-    "description": "Ticari Gayrimenkul CRM Uygulaması",
+    "name": "Serdar Emlak Portal",
+    "short_name": "Serdar Emlak",
+    "description": "Ticari Gayrimenkul Yönetim Sistemi",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#0f172a",

@@ -1,17 +1,11 @@
 import { PropertyForm } from "@/components/properties/PropertyForm"
 import { AddClientForm } from "@/components/clients/AddClientForm"
-import { MapPicker } from "@/components/common/MapPicker"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useState } from "react"
 import { createProperty, createClient, uploadPropertyImages } from "@/lib/db"
-// import type { Property } from "@/types"
-// import { useAuth } from "@/contexts/AuthContext"
-// import { ShieldAlert } from "lucide-react"
 
 export default function AddPage() {
-    const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
     const [isSaving, setIsSaving] = useState(false)
-    // const { user } = useAuth()
 
     const handlePropertySubmit = async (propertyData: any) => {
         setIsSaving(true)
@@ -20,12 +14,8 @@ export default function AddPage() {
             const imageFiles = (propertyData as any)._imageFiles as File[] | undefined
             delete (propertyData as any)._imageFiles // Remove from property data
 
-            const dataWithLocation = location
-                ? { ...propertyData, lat: location.lat, lng: location.lng }
-                : propertyData
-
             const { data, error } = await createProperty({
-                ...dataWithLocation,
+                ...propertyData,
                 status: 'active'
             })
 
@@ -44,8 +34,6 @@ export default function AddPage() {
                 } else {
                     alert("✅ Mülk başarıyla kaydedildi!")
                 }
-
-                setLocation(null)
             }
             return data
         } catch (error: any) {
@@ -84,18 +72,7 @@ export default function AddPage() {
                 </TabsList>
 
                 <TabsContent value="property">
-                    <div className="space-y-6">
-                        <PropertyForm onSubmit={handlePropertySubmit} isLoading={isSaving} />
-                        <div className="space-y-2 px-4">
-                            <h3 className="text-sm font-medium">Konum Seçimi</h3>
-                            <MapPicker onLocationSelect={(lat, lng) => setLocation({ lat, lng })} />
-                            {location && (
-                                <p className="text-xs text-muted-foreground">
-                                    Seçilen konum: {location.lat.toFixed(6)}, {location.lng.toFixed(6)}
-                                </p>
-                            )}
-                        </div>
-                    </div>
+                    <PropertyForm onSubmit={handlePropertySubmit} isLoading={isSaving} />
                 </TabsContent>
 
                 <TabsContent value="client">
