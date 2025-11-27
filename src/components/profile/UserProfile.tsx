@@ -35,8 +35,8 @@ export function UserProfile({ user }: UserProfileProps) {
                             <UserIcon className="h-8 w-8 text-primary" />
                         </div>
                         <div className="flex-1 min-w-0 overflow-hidden">
-                            <h2 className="text-xl font-bold truncate">{currentUser.name}</h2>
-                            <p className="text-[10px] text-muted-foreground truncate">{currentUser.email}</p>
+                            <h2 className="text-sm font-bold truncate">{currentUser.name}</h2>
+                            <p className="text-[9px] text-muted-foreground truncate break-all">{currentUser.email}</p>
                             <p className="text-xs text-primary font-semibold mt-1">👤 {currentUser.role}</p>
                         </div>
                     </div>
@@ -100,7 +100,7 @@ export function UserProfile({ user }: UserProfileProps) {
                         <UserIcon className="h-4 w-4 mr-2" />
                         Profili Düzenle
                     </Button>
-                    <Button variant="outline" className="w-full justify-start text-destructive hover:bg-destructive/10">
+                    <Button variant="outline" className="w-full justify-start text-destructive hover:bg-destructive/10 pl-2">
                         <LogOut className="h-4 w-4 mr-2" />
                         Çıkış Yap
                     </Button>
