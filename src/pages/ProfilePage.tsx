@@ -5,7 +5,7 @@ import { DataManager } from "@/components/common/DataManager"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { getRoleDisplayName } from "@/lib/auth"
-import { User, Shield, Key } from "lucide-react"
+import { User, Shield, Key, LogOut } from "lucide-react"
 
 export default function ProfilePage() {
     const { user, logout } = useAuth()
@@ -40,9 +40,10 @@ export default function ProfilePage() {
                         </div>
                         <button
                             onClick={logout}
-                            className="text-sm text-red-600 hover:text-red-700 font-medium underline decoration-red-200 underline-offset-4"
+                            className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Çıkış Yap"
                         >
-                            Çıkış Yap
+                            <LogOut className="w-5 h-5" />
                         </button>
                     </div>
                 </CardContent>
