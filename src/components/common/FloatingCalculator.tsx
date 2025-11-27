@@ -11,10 +11,10 @@ export function FloatingCalculator() {
             {/* Floating Button */}
             <Button
                 onClick={() => setIsOpen(true)}
-                className="fixed bottom-20 right-4 z-40 h-14 w-14 rounded-full shadow-lg bg-gradient-to-br from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all duration-300 hover:scale-110"
+                className="fixed bottom-20 right-4 z-40 h-12 w-12 rounded-full shadow-md bg-primary hover:bg-primary/90 transition-all duration-300 hover:scale-105 opacity-90 hover:opacity-100"
                 size="icon"
             >
-                <Calculator className="h-6 w-6 text-white" />
+                <Calculator className="h-5 w-5 text-white" />
             </Button>
 
             {/* Calculator Dialog */}
