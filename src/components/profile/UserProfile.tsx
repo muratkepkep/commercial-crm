@@ -34,9 +34,9 @@ export function UserProfile({ user }: UserProfileProps) {
                         <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                             <UserIcon className="h-8 w-8 text-primary" />
                         </div>
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1 min-w-0 overflow-hidden">
                             <h2 className="text-xl font-bold truncate">{currentUser.name}</h2>
-                            <p className="text-xs text-muted-foreground break-all line-clamp-2">{currentUser.email}</p>
+                            <p className="text-[11px] text-muted-foreground truncate">{currentUser.email}</p>
                             <p className="text-xs text-primary font-semibold mt-1">👤 {currentUser.role}</p>
                         </div>
                     </div>

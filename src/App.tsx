@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { BottomNav } from "@/components/common/BottomNav"
+import { FloatingCalculator } from "@/components/common/FloatingCalculator"
 import ClientsPage from "@/pages/ClientsPage"
 import PropertiesPage from "@/pages/PropertiesPage"
 import PropertyDetailPage from "@/pages/PropertyDetailPage"
@@ -35,6 +36,7 @@ function App() {
             </Routes>
           </div>
           <BottomNav />
+          <FloatingCalculator />
         </div>
       </BrowserRouter>
     </AuthProvider>
