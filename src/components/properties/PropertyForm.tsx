@@ -327,10 +327,9 @@ Detaylar için arayınız.`.trim()
                 {listingType === "kiralik" && propertyOwners.length > 0 && (
                     <div className="space-y-2">
                         <Label>Mülk Sahibi</Label>
-                        <Select value={propertyOwnerId} onValueChange={setPropertyOwnerId}>
+                        <Select value={propertyOwnerId || undefined} onValueChange={setPropertyOwnerId}>
                             <SelectTrigger><SelectValue placeholder="Seçiniz (İsteğe bağlı)" /></SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="">-- Seçiniz --</SelectItem>
                                 {propertyOwners.map(owner => (
                                     <SelectItem key={owner.id} value={owner.id}>
                                         {owner.full_name} {owner.phone && `(${owner.phone})`}

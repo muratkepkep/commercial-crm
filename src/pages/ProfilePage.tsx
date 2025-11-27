@@ -24,11 +24,11 @@ export default function ProfilePage() {
                             <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg">
                                 {(user.full_name || user.username || user.email || 'U').charAt(0).toUpperCase()}
                             </div>
-                            <div>
-                                <h2 className="text-xl font-bold text-gray-900">{user.full_name || user.username || user.email || 'Kullanıcı'}</h2>
-                                <p className="text-gray-500 flex items-center gap-2">
-                                    <User className="w-4 h-4" />
-                                    @{user.username || user.email || 'user'}
+                            <div className="min-w-0 flex-1">
+                                <h2 className="text-xl font-bold text-gray-900 truncate">{user.full_name || user.username || user.email || 'Kullanıcı'}</h2>
+                                <p className="text-sm text-gray-500 flex items-center gap-2 truncate">
+                                    <User className="w-4 h-4 flex-shrink-0" />
+                                    <span className="truncate">@{user.username || user.email || 'user'}</span>
                                 </p>
                                 <div className="mt-2">
                                     <Badge variant="secondary" className="bg-blue-100 text-blue-800 hover:bg-blue-200">

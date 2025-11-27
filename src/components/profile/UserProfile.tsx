@@ -36,7 +36,7 @@ export function UserProfile({ user }: UserProfileProps) {
                         </div>
                         <div className="flex-1 min-w-0 overflow-hidden">
                             <h2 className="text-xl font-bold truncate">{currentUser.name}</h2>
-                            <p className="text-[11px] text-muted-foreground truncate">{currentUser.email}</p>
+                            <p className="text-[10px] text-muted-foreground truncate">{currentUser.email}</p>
                             <p className="text-xs text-primary font-semibold mt-1">👤 {currentUser.role}</p>
                         </div>
                     </div>

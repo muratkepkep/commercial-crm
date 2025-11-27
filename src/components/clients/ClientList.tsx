@@ -101,7 +101,7 @@ export function ClientList() {
         if (role === "alici") return "Alıcı"
         if (role === "satici") return "Satıcı"
         if (role === "kiraci") return "Kiracı"
-        if (role === "ev_sahibi") return "Ev Sahibi"
+        if (role === "ev_sahibi") return "Ev Sahibi / Fabrika Sahibi"
         return "Bilinmiyor"
     }
 
@@ -204,7 +204,7 @@ export function ClientList() {
                                                 </span>
                                             </div>
                                         )}
-                                        {(client as any).search_type && (
+                                        {(client as any).search_type && ((client as any).client_intent === 'almak_istiyor' || (client as any).client_intent === 'kiralamak_istiyor') && (
                                             <div className="flex items-center text-sm text-purple-700 dark:text-purple-400">
                                                 <span className="mr-2">🔍</span>
                                                 <span>
