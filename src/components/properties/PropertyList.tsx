@@ -233,6 +233,11 @@ Detaylar için arayınız.
                                                         <span>📍 Ada: {property.ada} / Parsel: {property.parsel}</span>
                                                     </div>
                                                 )}
+                                                {property.property_owner && (
+                                                    <div className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 col-span-2">
+                                                        <span className="font-medium text-xs">👤 {property.property_owner.full_name}</span>
+                                                    </div>
+                                                )}
                                             </div>
                                         </CardContent>
                                         <CardFooter className="gap-2 pt-3">
@@ -267,6 +272,23 @@ Detaylar için arayınız.
                     {editingProperty && (
                         <PropertyForm
                             initialData={editingProperty}
+                            images={propertyImages[editingProperty.id] || []}
+                            onDeleteImage={async (imageId, storagePath) => {
+                                try {
+                                    await deletePropertyImage(imageId, storagePath)
+                                    // Refresh images in list
+                                    const { data } = await getPropertyImages(editingProperty.id)
+                                    if (data) {
+                                        setPropertyImages(prev => ({
+                                            ...prev,
+                                            [editingProperty.id]: data
+                                        }))
+                                    }
+                                } catch (error) {
+                                    console.error("Error deleting image:", error)
+                                    alert("Görsel silinemedi.")
+                                }
+                            }}
                             onSubmit={async (updatedData) => {
                                 try {
                                     console.log('🔵 Updating property:', editingProperty.id, updatedData)

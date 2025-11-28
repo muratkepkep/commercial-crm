@@ -241,6 +241,21 @@ Detaylar için: ${window.location.href}
                                 <p className="font-medium">{new Date(property.created_at).toLocaleDateString('tr-TR')}</p>
                             </div>
                         </div>
+
+                        {property.property_owner && (
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-900/30">
+                                    <Building2 className="h-4 w-4" />
+                                </div>
+                                <div>
+                                    <p className="text-xs text-muted-foreground">Mal Sahibi</p>
+                                    <p className="font-medium">{property.property_owner.full_name}</p>
+                                    {property.property_owner.phone && (
+                                        <p className="text-xs text-muted-foreground">{property.property_owner.phone}</p>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -321,6 +336,18 @@ Detaylar için: ${window.location.href}
                     {property && (
                         <PropertyForm
                             initialData={property}
+                            images={images}
+                            onDeleteImage={async (imageId, storagePath) => {
+                                try {
+                                    await deletePropertyImage(imageId, storagePath)
+                                    // Refresh images list
+                                    const { data } = await getPropertyImages(property.id)
+                                    if (data) setImages(data)
+                                } catch (error) {
+                                    console.error("Error deleting image:", error)
+                                    alert("Görsel silinemedi.")
+                                }
+                            }}
                             onSubmit={async (updatedData) => {
                                 try {
                                     // Extract image files

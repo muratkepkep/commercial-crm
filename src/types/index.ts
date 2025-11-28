@@ -83,6 +83,10 @@ export interface Property {
     status: 'active' | 'sold' | 'rented';
     property_owner_id?: string; // References client with role 'ev_sahibi'
     owner_id?: string;
+    property_owner?: {
+        full_name: string;
+        phone?: string;
+    };
 }
 
 export interface Todo {

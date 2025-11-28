@@ -7,16 +7,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { IndustrialCalculator } from "./IndustrialCalculator"
 import type { Property, PropertyCategory, ListingType, Client } from "@/types"
 import { X } from "lucide-react"
-import { getClientsByRole } from "@/lib/db"
+import { getClientsByRole, getPropertyImageUrl } from "@/lib/db"
 import { MapPicker } from "./MapPicker"
 
 interface PropertyFormProps {
     initialData?: Partial<Property>
     onSubmit?: (data: Partial<Property>) => Promise<any>
     isLoading?: boolean
+    images?: any[]
+    onDeleteImage?: (imageId: string, storagePath: string) => Promise<void>
 }
 
-export function PropertyForm({ initialData, onSubmit, isLoading }: PropertyFormProps) {
+export function PropertyForm({ initialData, onSubmit, isLoading, images = [], onDeleteImage }: PropertyFormProps) {
     // Property categorization
     const [propertyCategory, setPropertyCategory] = React.useState<PropertyCategory>(initialData?.property_category || "fabrika")
     const [listingType, setListingType] = React.useState<ListingType>(initialData?.listing_type || initialData?.property_type as any || "satilik")
@@ -64,7 +66,8 @@ export function PropertyForm({ initialData, onSubmit, isLoading }: PropertyFormP
     const [lng, setLng] = React.useState<number | undefined>(initialData?.lng)
 
     const [selectedFiles, setSelectedFiles] = React.useState<File[]>([])
-    const [existingImages, setExistingImages] = React.useState<string[]>(initialData?.image_urls || [])
+    // Use images prop if available, otherwise fallback to initialData.image_urls (legacy)
+    const [existingImages, setExistingImages] = React.useState<any[]>(images.length > 0 ? images : (initialData?.image_urls || []))
     const fileInputRef = React.useRef<HTMLInputElement>(null)
 
     // Load property owners (clients with role 'ev_sahibi')
@@ -127,8 +130,16 @@ export function PropertyForm({ initialData, onSubmit, isLoading }: PropertyFormP
         setSelectedFiles(prev => prev.filter((_, i) => i !== index))
     }
 
-    const removeExistingImage = (index: number) => {
-        setExistingImages(prev => prev.filter((_, i) => i !== index))
+    const removeExistingImage = async (index: number) => {
+        const image = existingImages[index]
+        if (onDeleteImage && typeof image === 'object' && image.id) {
+            if (confirm('Bu görseli silmek istediğinize emin misiniz?')) {
+                await onDeleteImage(image.id, image.storage_path)
+                setExistingImages(prev => prev.filter((_, i) => i !== index))
+            }
+        } else {
+            setExistingImages(prev => prev.filter((_, i) => i !== index))
+        }
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -157,7 +168,7 @@ export function PropertyForm({ initialData, onSubmit, isLoading }: PropertyFormP
                 power_kw: power ? parseFloat(power) : undefined,
                 ada: ada || undefined,
                 parsel: parsel || undefined,
-                property_owner_id: (listingType === "kiralik" && propertyOwnerId) ? propertyOwnerId : undefined,
+                property_owner_id: propertyOwnerId || undefined,
 
                 // New fields
                 room_count: roomCount || undefined,
@@ -324,7 +335,7 @@ Detaylar için arayınız.`.trim()
                     <Input id="address" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Mahalle, sokak, bina no..." />
                 </div>
 
-                {listingType === "kiralik" && propertyOwners.length > 0 && (
+                {propertyOwners.length > 0 && (
                     <div className="space-y-2">
                         <Label>Mülk Sahibi</Label>
                         <Select value={propertyOwnerId || undefined} onValueChange={setPropertyOwnerId}>
@@ -579,14 +590,18 @@ Detaylar için arayınız.`.trim()
 
                     {existingImages.length > 0 && (
                         <div className="flex flex-wrap gap-2 mt-2">
-                            {existingImages.map((url, idx) => (
-                                <div key={idx} className="relative group">
-                                    <img src={url} alt={`Existing ${idx}`} className="w-20 h-20 object-cover rounded border" />
-                                    <button type="button" onClick={() => removeExistingImage(idx)} className="absolute -top-2 -right-2 bg-destructive text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <X className="h-3 w-3" />
-                                    </button>
-                                </div>
-                            ))}
+                            {existingImages.map((img, idx) => {
+                                const displayUrl = typeof img === 'string' ? img : getPropertyImageUrl(img.storage_path)
+
+                                return (
+                                    <div key={idx} className="relative group">
+                                        <img src={displayUrl} alt={`Existing ${idx}`} className="w-20 h-20 object-cover rounded border" />
+                                        <button type="button" onClick={() => removeExistingImage(idx)} className="absolute -top-2 -right-2 bg-destructive text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <X className="h-3 w-3" />
+                                        </button>
+                                    </div>
+                                )
+                            })}
                         </div>
                     )}
 
