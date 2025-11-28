@@ -13,7 +13,7 @@ export const getProperties = async (): Promise<{ data: Property[]; error: any }>
 
         const { data, error } = await supabase
             .from('properties')
-            .select('*, property_owner:clients!property_owner_id(full_name, phone)')
+            .select('*')
             .eq('user_id', user.id)
             .order('created_at', { ascending: false })
 
@@ -29,7 +29,7 @@ export const getProperty = async (id: string): Promise<{ data: Property | null; 
     try {
         const { data, error } = await supabase
             .from('properties')
-            .select('*, property_owner:clients!property_owner_id(full_name, phone)')
+            .select('*')
             .eq('id', id)
             .single()
 
